@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file: .env
+    volumes:
+      - ./backend:/workspace
+    working_dir: /workspace
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    env_file: .env
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --hostname 0.0.0.0"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file: .env
+    volumes:
+      - ./backend:/workspace
+    working_dir: /workspace
+    command: python -m app.workers.main
+    depends_on:
+      - backend
+      - rabbitmq
+      - redis
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: gymos
+      POSTGRES_PASSWORD: gymos
+      POSTGRES_DB: gymos
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
