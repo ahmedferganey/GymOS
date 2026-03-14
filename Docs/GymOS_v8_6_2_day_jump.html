@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>GymOS v8.6.2 — Training Day Jump</title>
+<style>
+:root {
+  --bg:#0b0f14; --panel:#121821; --panel2:#171f2b; --muted:#92a0b4; --muted2:#6b7788;
+  --text:#eef4ff; --line:#253140; --accent:#4fd5a8; --accent2:#6da7ff; --warn:#ffbf47; --danger:#ff6d7a;
+  --radius:20px; --radius-sm:14px; --shadow:0 14px 36px rgba(0,0,0,.38);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
+body[data-theme="light"] {
+  --bg:#f4f7fb; --panel:#ffffff; --panel2:#eef3fa; --muted:#506074; --muted2:#6f8093;
+  --text:#152131; --line:#d6e0eb; --accent:#179b74; --accent2:#316edb; --warn:#b77900; --danger:#cf3048;
+  --shadow:0 14px 36px rgba(21,33,49,.08);
+}
+* { box-sizing:border-box; }
+html,body { height:100%; margin:0; }
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(79,213,168,.12), transparent 40%),
+    radial-gradient(900px 500px at 100% 0%, rgba(109,167,255,.12), transparent 35%),
+    var(--bg);
+  color:var(--text);
+}
+button, input, select, textarea { font:inherit; }
+button { cursor:pointer; }
+.app { min-height:100%; max-width:520px; margin:0 auto; padding:16px 16px calc(84px + var(--safe-b)); }
+.screen { display:none; }
+.screen.active { display:block; }
+.top {
+  position:sticky; top:0; z-index:15; padding:8px 0 14px;
+  background:linear-gradient(180deg, rgba(11,15,20,.95), rgba(11,15,20,.82) 70%, rgba(11,15,20,0));
+  backdrop-filter: blur(12px);
+}
+.brand {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  margin-bottom:12px;
+}
+.logoWrap { display:flex; gap:12px; align-items:center; }
+.logo {
+  width:44px; height:44px; border-radius:14px; border:1px solid rgba(255,255,255,.08);
+  background:
+    radial-gradient(circle at 30% 30%, rgba(79,213,168,.95), transparent 52%),
+    radial-gradient(circle at 70% 70%, rgba(109,167,255,.95), transparent 48%),
+    linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.03));
+  box-shadow: var(--shadow);
+}
+.title h1 { margin:0; font-size:18px; line-height:1.1; }
+.title p { margin:4px 0 0; color:var(--muted); font-size:12px; }
+.iconBtn {
+  border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--text);
+  width:42px; height:42px; border-radius:14px;
+}
+.hero {
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  border:1px solid var(--line); border-radius:24px; padding:16px; box-shadow: var(--shadow);
+}
+.badgeRow { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+.badge {
+  font-size:11px; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:8px 10px;
+  background:rgba(255,255,255,.03);
+}
+.badge.good { color:var(--accent); border-color:rgba(79,213,168,.26); }
+.badge.blue { color:var(--accent2); border-color:rgba(109,167,255,.24); }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.card {
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
+  border:1px solid var(--line); border-radius:20px; padding:14px; box-shadow: var(--shadow);
+}
+.card h2,.card h3,.card h4 { margin:0 0 10px; }
+.card h2 { font-size:16px; }
+.card h3 { font-size:14px; }
+.card h4 { font-size:13px; color:var(--muted); }
+.section { margin-top:14px; }
+.kv { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.kv .slot, .chipInput {
+  border:1px solid var(--line); border-radius:16px; background:rgba(255,255,255,.03); padding:10px 12px;
+}
+.slot label, .chipInput label { display:block; color:var(--muted); font-size:11px; margin-bottom:6px; }
+.slot .v { font-size:18px; font-weight:700; }
+select, input[type="number"], input[type="text"], textarea {
+  width:100%; border:none; outline:none; background:transparent; color:var(--text);
+}
+.row { display:flex; gap:10px; align-items:center; }
+.row.between { justify-content:space-between; }
+.btn {
+  border:none; border-radius:16px; padding:12px 14px; color:var(--text);
+  background:rgba(255,255,255,.06); border:1px solid var(--line); font-weight:700;
+}
+.btn.primary { background:linear-gradient(180deg, rgba(79,213,168,.22), rgba(79,213,168,.12)); border-color:rgba(79,213,168,.3); color:#eafef7; }
+.btn.secondary { background:linear-gradient(180deg, rgba(109,167,255,.2), rgba(109,167,255,.1)); border-color:rgba(109,167,255,.28); }
+.btn.ghost { background:transparent; }
+.list { display:flex; flex-direction:column; gap:10px; }
+.dayCard {
+  border:1px solid var(--line); border-radius:18px; padding:14px; background:rgba(255,255,255,.03);
+}
+.dayCard.active { border-color:rgba(109,167,255,.3); background:rgba(109,167,255,.08); }
+.small { font-size:12px; color:var(--muted); }
+.exercise {
+  border:1px solid var(--line); border-radius:18px; overflow:hidden; background:rgba(255,255,255,.03);
+}
+.exHead { padding:14px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.exBody { padding:0 14px 14px; display:grid; gap:12px; }
+.exName { font-size:15px; font-weight:750; line-height:1.2; }
+.exTags { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.tag { font-size:11px; padding:6px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); }
+.tag.good { border-color:rgba(79,213,168,.25); color:var(--accent); }
+.tag.blue { border-color:rgba(109,167,255,.26); color:var(--accent2); }
+.tag.warn { border-color:rgba(255,191,71,.26); color:var(--warn); }
+.cols {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:10px;
+}
+.miniGrid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.note {
+  min-height:72px; border:1px solid var(--line); border-radius:14px; padding:10px 12px; background:rgba(255,255,255,.03);
+}
+.toolbar { display:flex; gap:10px; flex-wrap:wrap; }
+.progressBar {
+  height:10px; border-radius:999px; overflow:hidden; border:1px solid var(--line); background:rgba(255,255,255,.04);
+}
+.progressBar > span {
+  display:block; height:100%; background:linear-gradient(90deg, var(--accent), var(--accent2));
+}
+.bottomNav {
+  position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; justify-content:center;
+  padding:10px 12px calc(10px + var(--safe-b));
+  background:linear-gradient(180deg, rgba(11,15,20,0), rgba(11,15,20,.95) 30%);
+}
+.navShell {
+  width:min(520px, calc(100vw - 24px)); display:grid; grid-template-columns:repeat(7,1fr); gap:8px;
+  border:1px solid var(--line); border-radius:22px; padding:8px; background:rgba(18,24,33,.92); backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+}
+.navBtn {
+  border:none; background:transparent; color:var(--muted); padding:10px 6px; border-radius:16px; font-size:11px; font-weight:700;
+}
+.navBtn.active { background:rgba(109,167,255,.14); color:var(--text); }
+table { width:100%; border-collapse:collapse; }
+th,td { padding:10px 8px; border-bottom:1px solid rgba(255,255,255,.06); font-size:12px; text-align:left; }
+th { color:var(--muted); font-weight:700; }
+.toast {
+  position:fixed; left:50%; transform:translateX(-50%); bottom:96px; z-index:30;
+  background:rgba(18,24,33,.98); border:1px solid var(--line); border-radius:999px; padding:10px 14px; color:var(--text);
+  box-shadow: var(--shadow); opacity:0; pointer-events:none; transition:.18s ease;
+}
+.toast.show { opacity:1; }
+.divider { height:1px; background:rgba(255,255,255,.06); margin:10px 0; }
+.quickActions { display:flex; gap:10px; overflow:auto; padding-bottom:2px; }
+.quickActions .btn { white-space:nowrap; }
+
+.statGrid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.chartList { display:flex; flex-direction:column; gap:12px; }
+.barRow { display:grid; grid-template-columns:72px 1fr 52px; gap:10px; align-items:center; }
+.pill { display:inline-flex; align-items:center; gap:6px; font-size:11px; padding:6px 10px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.03); color:var(--muted); }
+.callout { border:1px dashed rgba(255,255,255,.14); border-radius:16px; padding:12px; background:rgba(255,255,255,.025); }
+
+
+html, body { overflow-x:hidden; overscroll-behavior-y:contain; }
+body { -webkit-overflow-scrolling:touch; }
+.card, .exercise, .dayCard, .chipInput, .slot { min-width:0; }
+.exHead { flex-wrap:wrap; }
+.exHead > * { min-width:0; }
+.exName, .small, .tag, label, .chipInput label { word-break:break-word; }
+.chipInput input, .chipInput select, .chipInput textarea { min-width:0; }
+.toolbar { flex-wrap:wrap; }
+.toolbar .btn { flex:1 1 120px; min-width:0; }
+@media (max-width: 560px) {
+  .app { padding-left:12px; padding-right:12px; }
+  .grid2, .kv, .cols, .miniGrid, .statGrid3 { grid-template-columns:1fr; }
+  .barRow { grid-template-columns:64px 1fr 48px; }
+  .row { flex-wrap:wrap; }
+  .row > * { min-width:0; }
+  .brand { align-items:flex-start; }
+  .logoWrap { align-items:flex-start; }
+  .title { min-width:0; }
+  .title h1 { font-size:16px; }
+  .title p { font-size:11px; }
+  .navShell { width:calc(100vw - 16px); gap:4px; padding:6px; }
+  .navBtn { padding:10px 4px; font-size:10px; }
+  .exBody { gap:10px; }
+  .chipInput { padding:10px; }
+  .quickActions { padding-bottom:6px; }
+}
+
+@media (min-width:760px) {
+  .app { max-width:980px; }
+  .desktopGrid { display:grid; grid-template-columns:1.08fr .92fr; gap:14px; }
+  .bottomNav { justify-content:flex-end; right:18px; left:auto; }
+  .navShell { width:360px; }
+}
+
+.dayJumpBar { position:sticky; top:74px; z-index:12; margin-top:10px; }
+.dayJumpBar .card { padding:10px; }
+.jumpScroller { display:flex; gap:8px; overflow:auto; padding-bottom:2px; scroll-snap-type:x proximity; }
+.jumpChip { white-space:nowrap; scroll-snap-align:start; }
+.dayBodyCollapsed { display:none; }
+.daySummaryActions { display:flex; gap:8px; flex-wrap:wrap; }
+@media (max-width:560px) { .dayJumpBar { top:68px; } }
+
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand">
+      <div class="logoWrap">
+        <div class="logo"></div>
+        <div class="title">
+          <h1>GymOS v8.6.2</h1>
+          <p>Mobile-first smart coach with session lock, improved mobile editor scrolling, and faster training-day navigation: planning stays adaptive, but once a session starts the prescription is frozen until you finish it.</p>
+        </div>
+      </div>
+      <button class="iconBtn" id="themeBtn" aria-label="toggle theme">◐</button>
+    </div>
+  </div>
+
+  <section class="screen active" id="screen-today"></section>
+  <section class="screen" id="screen-training"></section>
+  <section class="screen" id="screen-progress"></section>
+  <section class="screen" id="screen-nutrition"></section>
+  <section class="screen" id="screen-recovery"></section>
+  <section class="screen" id="screen-coach"></section>
+  <section class="screen" id="screen-loadguide"></section>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<nav class="bottomNav">
+  <div class="navShell">
+    <button class="navBtn active" data-screen="today">Today</button>
+    <button class="navBtn" data-screen="training">Training</button>
+    <button class="navBtn" data-screen="progress">Progress</button>
+    <button class="navBtn" data-screen="nutrition">Nutrition</button>
+    <button class="navBtn" data-screen="recovery">Recovery</button>
+    <button class="navBtn" data-screen="coach">Coach</button>
+    <button class="navBtn" data-screen="loadguide">Load Guide</button>
+  </div>
+</nav>
+
+<script>
+const OLD_KEYS = ["ahmed_swimmer_powerbuilding_v5","ahmed_swimmer_powerbuilding_v4","ahmed_swimmer_powerbuilding_v3"];
+const STORAGE_KEY = "gymos_v8_adaptive_coaching_intelligence";
+const THEME_KEY = "gymos_theme";
+const APP_VERSION = "v8.6";
+
+function normalizeWeekType(type) {
+  const raw = String(type || "auto").trim().toLowerCase().replaceAll(" ", "");
+  if (raw === "refeed_deload" || raw === "refeed+deload") return "refeed+deload";
+  if (raw === "normal" || raw === "refeed" || raw === "deload" || raw === "auto") return raw;
+  return "auto";
+}
+function applyTheme(theme) {
+  const next = theme === "light" ? "light" : "dark";
+  document.body.dataset.theme = next;
+  storageSet(THEME_KEY, next);
+  const btn = $("themeBtn");
+  if (btn) btn.textContent = next === "light" ? "☾" : "◐";
+}
+const PROGRAM = [{"id": "d1", "name": "Day 1 — Upper Neural Primer", "focus": "Heavy-but-clean upper pressing and pulling with tighter CNS control and balanced chest/back density.", "cardio": {"type": "Incline Walk (Zone 2)", "minutes": 15}, "group": "upperHeavy", "warmup": [["Hip Thrust (bodyweight)", 2, "12–15"], ["Dead Bug", 2, "8–10 / side"], ["Band Pull-Apart", 2, "15–20"], ["Scap Push-Up", 2, "10–12"], ["Arm Circles", 2, "20s each way"]], "notes": "Use Day 1 as neural work: no missed reps, long compound rests, and low emotional arousal. Added chest/back work replaces direct triceps fatigue.", "exercises": [["Incline Barbell Press", "compound", "5", "5", "RIR 2", "2-1-1", ["Upper chest"], ["Front delts", "Triceps"], "Smith Incline Press • Incline DB Press"], ["Pull-Up Progression (Assisted/Band)", "compound", "5", "5", "RIR 2", "2-1-1", ["Lats"], ["Biceps", "Upper back"], "Wide-Grip Lat Pulldown • Negative Pull-Ups"], ["Barbell Bent-Over Row", "compound", "4", "6", "RIR 1–2", "2-1-1", ["Upper back"], ["Lats", "Biceps"], "Chest-Supported Row • T-Bar Row"], ["Flat Dumbbell Press", "compound", "3", "6", "RIR 1–2", "2-1-1", ["Chest"], ["Triceps"], "Smith Flat Press • Machine Chest Press"], ["Weighted Chest Dips", "compound", "3", "6–10", "RIR 1–2", "2-1-1", ["Lower chest"], ["Triceps", "Front delts"], "Assisted chest dip • Decline press"], ["Machine Chest Press (Flat)", "compound", "3", "8–10", "RIR 1–2", "2-1-1", ["Mid chest"], ["Triceps"], "Smith Flat Press • Plate-loaded chest press"], ["Chest-Supported Row (upper-back bias)", "compound", "3", "8–10", "RIR 1–2", "2-1-1", ["Upper back"], ["Rear delts", "Biceps"], "Seal row • Machine high row"], ["Neutral-Grip Lat Pulldown", "compound", "3", "8–12", "RIR 1–2", "2-1-1", ["Lats"], ["Biceps", "Upper back"], "Neutral-grip pull-up • MAG pulldown"]]}, {"id": "d2", "name": "Day 2 — Lat Width Specialization", "focus": "V-taper width plus lat/upper-back row balance, then direct triceps hypertrophy.", "cardio": {"type": "Row Machine (steady)", "minutes": 15}, "group": "upperHypertrophy", "warmup": [["Glute Bridge", 2, "15"], ["90/90 Hip Rotation", 2, "8 / side"], ["Cat-Cow", 2, "8–10"], ["Band Straight-Arm Pulldown", 2, "12–15"], ["Scap Pull-Up / Hang", 2, "6–8"]], "notes": "Controlled eccentrics and moderate rests. Build lats first, then finish with lower-CNS triceps work. Rear-delt health stays covered on shoulder day.", "exercises": [["Wide-Grip Lat Pulldown", "compound", "4", "8–12", "RIR 1–2", "2-1-1", ["Lats"], ["Upper back"], "Pull-Up Progression"], ["EZ-Bar Seated Cable Row", "compound", "4", "10–12", "RIR 1–2", "2-1-1", ["Lower lats"], ["Lats"], "One-arm cable row (lat bias)"], ["Cable Lat Prayer (Kneeling Lat Pulldown)", "isolation", "3", "12–15", "RIR 0–1", "2-1-2", ["Lower lats"], ["Lats", "Serratus"], "Rope straight-arm pulldown • DB pullover"], ["Chest-Supported Row", "compound", "3", "8–12", "RIR 1–2", "2-1-1", ["Upper back"], ["Lats"], "T-Bar Row (chest supported)"], ["T-Bar Row (lat bias)", "compound", "4", "8–12", "RIR 1–2", "2-1-1", ["Upper back"], ["Lats"], "Chest-supported T-bar • Machine high row"], ["T-Bar Row (Narrow Grip – upper back bias)", "compound", "3", "8–12", "RIR 1–2", "2-1-1", ["Upper back"], ["Lats", "Biceps"], "Chest-supported T-bar • Machine low row"], ["Single Flat-Bench Dumbbell Triceps Extension", "isolation", "4", "12", "RIR 1–2", "2-1-2", ["Triceps"], [], "Single-arm cable extension • DB skullcrusher"], ["EZ-Bar Skullcrusher (Flat Bench)", "isolation", "3", "10", "RIR 1–2", "2-1-2", ["Triceps"], [], "Flat-bar skullcrusher • Machine extension"], ["Rope Pushdown", "isolation", "3", "15", "RIR 0–1", "2-1-2", ["Triceps"], [], "V-bar pushdown • Straight-bar pushdown"], ["Single-Arm Cable Pushdown", "isolation", "3", "10", "RIR 1", "2-1-2", ["Triceps"], [], "Reverse-grip pushdown • Cable kickback"]]}, {"id": "d3", "name": "Day 3 — Lower Power", "focus": "Quads strength with posterior chain support and the biggest pelvic warm-up priority.", "cardio": {"type": "Bike (steady)", "minutes": 15}, "group": "lowerHeavy", "warmup": [["Hip Thrust (bodyweight)", 3, "12"], ["Frog Stretch", 2, "30–40s"], ["Banded Lateral Walk", 2, "12–15 / side"], ["Bodyweight Squat", 2, "10–12"], ["Plank", 2, "25–35s"]], "notes": "Open the groin, wake glute med, then groove squat mechanics before heavy work.", "exercises": [["Smith Squat", "compound", "5", "5", "RIR 2", "3-1-1", ["Quads"], ["Glutes", "Core"], "High-bar squat (if barbell)"], ["Romanian Deadlift", "compound", "4", "6", "RIR 1–2", "3-1-1", ["Hamstrings"], ["Glutes", "Lower back"], "Stiff-leg deadlift"], ["Leg Press (quad bias: low & narrow)", "compound", "3", "6–10", "RIR 1–2", "2-1-1", ["Quads"], ["Glutes"], "Smith front-foot-elevated split squat"], ["Lying Leg Curl", "isolation", "3", "10–15", "RIR 0–1", "2-1-2", ["Hamstrings"], [], "Seated leg curl"], ["Leg Extension", "isolation", "3", "12–15", "RIR 1–2", "2-1-2", ["Quads"], ["Knee stability"], "Machine quad extension"], ["Adductor Machine", "isolation", "3", "12–15", "RIR 1–2", "2-1-2", ["Adductors"], ["Groin"], "Cable adduction"], ["Standing Calf Raise", "isolation", "4", "10–15", "RIR 0–1", "2-1-2", ["Calves"], [], "Smith calf raise"], ["Cable Crunch", "isolation", "4", "12–20", "RIR 0–1", "2-1-2", ["Abs"], [], "Machine crunch"]]}, {"id": "d4", "name": "Day 4 — Shoulders + Arms", "focus": "Shoulder width, rear-delts, and direct arm hypertrophy with low CNS cost.", "cardio": {"type": "Incline Walk (easy)", "minutes": 10}, "group": "upperPump", "warmup": [["Glute Bridge", 2, "12"], ["Dead Bug", 2, "8 / side"], ["Band Pull-Apart", 2, "15–20"], ["Cable / Band External Rotation", 2, "12–15"], ["Light Pushdown + Curl", 2, "12 each"]], "notes": "Minimal CNS cost. Chase blood flow, joint position, and shoulder quality.", "exercises": [["Seated Dumbbell Shoulder Press", "compound", "4", "6–10", "RIR 1–2", "2-1-1", ["Shoulders"], ["Triceps"], "Smith Shoulder Press"], ["Dumbbell Lateral Raise", "isolation", "5", "12–20", "RIR 0–1", "2-1-2", ["Side delts"], [], "Cable lateral raise"], ["Cable Lateral Raise", "isolation", "4", "12–20", "RIR 0–1", "2-1-2", ["Side delts"], [], "Lean-away lateral raise"], ["Rear Delt Fly (machine or cables)", "isolation", "4", "12–20", "RIR 0–1", "2-1-2", ["Rear delts"], ["Upper back"], "Face pull"], ["Face Pull", "isolation", "3", "12–15", "RIR 0–1", "2-1-2", ["Rear delts"], ["Lower traps"], "Rear-delt row"], ["Hammer Curl", "isolation", "3", "10–12", "RIR 0–1", "2-1-2", ["Biceps"], ["Forearms"], "Incline DB curl"], ["Incline Dumbbell Curl", "isolation", "3", "10–12", "RIR 1", "2-1-2", ["Biceps"], [], "Cable curl • EZ-bar curl"], ["EZ Bar Preacher Curl", "isolation", "3", "10–12", "RIR 1", "2-1-2", ["Biceps"], [], "Machine preacher curl • Dumbbell preacher curl"], ["Cable Curl (Pump Finisher)", "isolation", "3", "12–15", "RIR 0–1", "2-1-2", ["Biceps"], ["Forearms"], "Machine cable curl • Resistance band curl"]]}, {"id": "d5", "name": "Day 5 — Upper Chest Specialization", "focus": "Upper chest priority with minimal lat maintenance and hypertrophy bias.", "cardio": {"type": "Jog (easy)", "minutes": 15}, "group": "upperHypertrophy", "warmup": [["Hip Thrust (bodyweight)", 2, "12"], ["Dead Bug", 2, "8–10 / side"], ["Band Pull-Apart", 2, "15–20"], ["Scap Push-Up", 2, "10–12"], ["Incline Push-Up", 2, "8–10"]], "notes": "Strong setup, long range, controlled lowering, and stop before bar path gets ugly.", "exercises": [["Incline Barbell Press", "compound", "4", "8–10", "RIR 1–2", "2-1-1", ["Upper chest"], ["Front delts", "Triceps"], "Smith Incline Press • Incline DB Press"], ["Seated Incline Machine Press", "compound", "4", "10–12", "RIR 1–2", "2-1-1", ["Upper chest"], ["Triceps"], "Incline DB Press"], ["Low-to-High Cable Fly", "isolation", "3", "12–15", "RIR 0–1", "2-1-2", ["Upper chest"], [], "Incline cable fly"], ["Wide-Grip Lat Pulldown", "compound", "3", "10–12", "RIR 1–2", "2-1-1", ["Lats"], ["Upper back"], "Pull-Ups"], ["Pull-Up Progression", "compound", "3", "AMRAP", "Stop @RIR1", "2-1-1", ["Lats"], ["Biceps"], "Assisted pull-ups"], ["Machine Chest Press (Flat)", "compound", "3", "8–12", "RIR 1–2", "2-1-1", ["Mid chest"], ["Triceps"], "Smith Flat Press • Machine Chest Press"], ["Incline Dumbbell Fly", "isolation", "3", "10–12", "RIR 1", "2-1-2", ["Upper chest"], [], "Pec deck"]]}, {"id": "d6", "name": "Day 6 — Athletic Lower + Glutes", "focus": "Posterior chain, glutes, work capacity, and athletic lower quality.", "cardio": {"type": "Bike / easy jog", "minutes": 20}, "group": "lowerAthletic", "warmup": [["Hip Thrust (bodyweight)", 2, "15"], ["Cossack Squat", 2, "6–8 / side"], ["Hip Airplane", 2, "5–6 / side"], ["Walking Lunge", 2, "10 / side"], ["Bird Dog", 2, "8 / side"]], "notes": "Athletic lower day should feel springy, not crushed.", "exercises": [["Barbell Hip Thrust", "compound", "4", "6–10", "RIR 1–2", "2-1-1", ["Glutes"], ["Hamstrings"], "Smith Hip Thrust"], ["Romanian Deadlift", "compound", "3", "6–10", "RIR 1–2", "3-1-1", ["Hamstrings"], ["Glutes", "Lower back"], "Good morning (light)"], ["Leg Press (glute bias: high & wide)", "compound", "3", "8–12", "RIR 1–2", "2-1-1", ["Glutes"], ["Quads"], "Smith reverse lunge"], ["Leg Extension (controlled)", "isolation", "3", "12–15", "RIR 0–1", "2-1-2", ["Quads"], [], "Sissy squat (assisted)"], ["Lying Leg Curl", "isolation", "3", "10–15", "RIR 0–1", "2-1-2", ["Hamstrings"], [], "Nordic curl (assisted)"], ["45° Back Extension (glute bias)", "compound", "3", "10–15", "RIR 1–2", "2-1-2", ["Glutes"], ["Lower back"], "Hip extension machine"], ["Standing Calf Raise", "isolation", "4", "10–15", "RIR 0–1", "2-1-2", ["Calves"], [], "Smith calf raise"], ["Hanging Leg Raise", "isolation", "3", "8–15", "RIR 0–1", "2-1-2", ["Abs"], [], "Cable knee raise"]]}, {"id": "d7", "name": "Day 7 — Mobility + Recovery", "focus": "Mobility, tissue quality, easy aerobic recovery, pelvic / thoracic / shoulder reset.", "cardio": {"type": "Recovery Walk / Bike", "minutes": 25}, "group": "recovery", "warmup": [["90/90 Hip Flow", 2, "60s / side"], ["Frog Stretch", 2, "40s"], ["Cat-Cow + T-Spine Reach", 2, "8 / side"], ["Band Pull-Apart + ER", 2, "15"], ["Breathing Reset", 2, "5 breaths"]], "notes": "Finish feeling better than you started.", "exercises": [["90/90 Hip Flow", "mobility", "2", "60s / side", "N/A", "controlled", ["Hips", "Pelvis"], [], "seated 90/90 switches"], ["Frog Stretch", "mobility", "2", "40s", "N/A", "controlled", ["Adductors", "Pelvis"], [], "sumo rock-back"], ["Cat-Cow + T-Spine Reach", "mobility", "2", "8 / side", "N/A", "controlled", ["Spine", "Upper back"], [], "thread-the-needle"], ["Band Pull-Apart + External Rotation", "mobility", "2", "15", "N/A", "controlled", ["Rear delts", "Rotator cuff"], [], "cable external rotation"], ["Crocodile Breathing / Dead Bug Reset", "mobility", "2", "5 breaths + 8 reps", "N/A", "controlled", ["Core", "Pelvis"], [], "90/90 breathing"]]}];
+
+const BASE_PROGRAM = JSON.parse(JSON.stringify(PROGRAM));
+
+function deepClone(v) { return JSON.parse(JSON.stringify(v)); }
+function slugify(v) { return String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'item'; }
+function warmupId(dayId, item, idx) { return item[3] || `${dayId}_wu_${idx+1}_${slugify(item[0])}`; }
+function exerciseId(dayId, item, idx) { return item[9] || `${dayId}_ex_${idx+1}_${slugify(item[0])}`; }
+function defaultWarmupRole() { return 'warmup'; }
+function defaultExerciseRole(ex, idx=0) {
+  const type = ex[1] || 'compound';
+  if (type === 'mobility') return 'mobility';
+  if (type === 'isolation') return idx >= 5 ? 'finisher' : 'isolation';
+  return idx <= 1 ? 'anchor_compound' : 'hypertrophy_compound';
+}
+function stampProgramMetadata(program) {
+  program.forEach(day => {
+    day.warmup = (day.warmup || []).map((w, idx) => {
+      const item = [...w];
+      item[3] = warmupId(day.id, item, idx);
+      item[4] = item[4] || defaultWarmupRole(item, idx);
+      return item;
+    });
+    day.exercises = (day.exercises || []).map((ex, idx) => {
+      const item = [...ex];
+      item[9] = exerciseId(day.id, item, idx);
+      item[10] = item[10] || defaultExerciseRole(item, idx);
+      return item;
+    });
+  });
+  return program;
+}
+stampProgramMetadata(PROGRAM);
+stampProgramMetadata(BASE_PROGRAM);
+
+function loadCustomProgramIntoProgram() {
+  const source = state.customProgram ? stampProgramMetadata(deepClone(state.customProgram)) : stampProgramMetadata(deepClone(BASE_PROGRAM));
+  PROGRAM.length = 0;
+  source.forEach(day => PROGRAM.push(day));
+}
+function persistCurrentProgram() {
+  state.customProgram = deepClone(PROGRAM);
+}
+function exerciseLibrary(kind='main') {
+  const map = new Map();
+  const source = BASE_PROGRAM;
+  source.forEach(day => {
+    const rows = kind === 'warmup' ? (day.warmup || []) : (day.exercises || []);
+    rows.forEach(item => {
+      const name = item[0];
+      if (!name || map.has(name.toLowerCase())) return;
+      if (kind === 'warmup') {
+        map.set(name.toLowerCase(), {name, sets: item[1], reps: item[2], role: item[4] || 'warmup'});
+      } else {
+        map.set(name.toLowerCase(), {
+          name, type: item[1], sets: item[2], reps: item[3], rir: item[4], tempo: item[5],
+          primary: deepClone(item[6] || []), secondary: deepClone(item[7] || []), substitute: item[8] || '', role: item[10] || defaultExerciseRole(item)
+        });
+      }
+    });
+  });
+  return Array.from(map.values()).sort((a,b)=>a.name.localeCompare(b.name));
+}
+const WARMUP_LIBRARY = exerciseLibrary('warmup');
+const MAIN_EXERCISE_LIBRARY = exerciseLibrary('main');
+
+function findLibraryItem(name, kind='main') {
+  const lib = kind === 'warmup' ? WARMUP_LIBRARY : MAIN_EXERCISE_LIBRARY;
+  return lib.find(x => x.name.toLowerCase() === String(name || '').trim().toLowerCase()) || null;
+}
+function parseMusclesInput(v) {
+  return String(v || '').split(',').map(x => x.trim()).filter(Boolean);
+}
+function musclesInputValue(arr) {
+  return (arr || []).join(', ');
+}
+function getBaseDay(dayId) {
+  return BASE_PROGRAM.find(d => d.id === dayId) || null;
+}
+function updateProgramDay(dayId, updater) {
+  if (isSessionLocked(state.week, dayId)) {
+    toast('Unlock current-week session before editing this day');
+    return false;
+  }
+  const prevProgram = deepClone(PROGRAM);
+  const day = PROGRAM.find(d => d.id === dayId);
+  if (!day) return false;
+  updater(day);
+  stampProgramMetadata(PROGRAM);
+  syncLogsToProgram(prevProgram, PROGRAM);
+  persistCurrentProgram();
+  save();
+  render();
+  return true;
+}
+function syncLogsToProgram(prevProgram, nextProgram) {
+  const prevByDay = Object.fromEntries(prevProgram.map(d => [d.id, d]));
+  const nextByDay = Object.fromEntries(nextProgram.map(d => [d.id, d]));
+  Object.keys(state.logs || {}).forEach(week => {
+    Object.keys(nextByDay).forEach(dayId => {
+      const prevDay = prevByDay[dayId];
+      const nextDay = nextByDay[dayId];
+      const oldMap = state.logs?.[week]?.[dayId] || {};
+      const prevIds = (prevDay?.exercises || []).map((ex, idx) => exerciseId(dayId, ex, idx));
+      const nextIds = (nextDay?.exercises || []).map((ex, idx) => exerciseId(dayId, ex, idx));
+      const remapped = {};
+      nextIds.forEach((id, newIdx) => {
+        const oldIdx = prevIds.indexOf(id);
+        if (oldIdx >= 0 && oldMap[oldIdx]) remapped[newIdx] = oldMap[oldIdx];
+      });
+      state.logs[week] ||= {};
+      state.logs[week][dayId] = remapped;
+    });
+  });
+}
+function baseTargetMuscles(dayId) {
+  return {
+    d1:['Upper chest','Lats','Upper back'],
+    d2:['Lats','Lower lats'],
+    d3:['Quads','Hamstrings'],
+    d4:['Shoulders','Side delts','Rear delts','Biceps'],
+    d5:['Upper chest'],
+    d6:['Glutes','Hamstrings'],
+    d7:['Hips','Pelvis','Spine','Core']
+  }[dayId] || [];
+}
+function dayDesignAnalysis(day) {
+  const baseDay = getBaseDay(day.id) || day;
+  const curExercises = day.exercises || [];
+  const baseExercises = baseDay.exercises || [];
+  const curWarmups = day.warmup || [];
+  const warnings = [];
+  const baseAnchorIds = baseExercises.filter((ex, idx) => (ex[10] || defaultExerciseRole(ex, idx)) === 'anchor_compound').map(ex => ex[9] || ex[0]);
+  const curAnchorIds = curExercises.filter((ex, idx) => (ex[10] || defaultExerciseRole(ex, idx)) === 'anchor_compound').map(ex => ex[9] || ex[0]);
+  const missingAnchors = baseAnchorIds.filter(id => !curAnchorIds.includes(id));
+  const currentFatigue = curExercises.reduce((a, ex) => a + fatigueCost(ex), 0);
+  const baseFatigue = baseExercises.reduce((a, ex) => a + fatigueCost(ex), 0);
+  const fatigueDelta = currentFatigue - baseFatigue;
+  const highFatigueCompounds = curExercises.filter((ex, idx) => ex[1] === 'compound' && ((ex[10] || defaultExerciseRole(ex, idx)) !== 'mobility') && (exerciseTier(ex) === 'Tier A' || /squat|deadlift|barbell|pull-up|row|press|thrust/i.test(ex[0]))).length;
+  const warmupSets = curWarmups.reduce((a, w) => a + (Number(w[1]) || 0), 0);
+  const targetMuscles = baseTargetMuscles(day.id);
+  const curTargetSets = curExercises.reduce((a, ex) => {
+    const sets = parseSets(ex[2]);
+    const hit = (ex[6] || []).some(m => targetMuscles.includes(m));
+    return a + (hit ? sets : 0);
+  }, 0);
+  const totalSets = curExercises.reduce((a, ex) => a + parseSets(ex[2]), 0);
+  const priorityCoverage = totalSets ? Math.round(curTargetSets / totalSets * 100) : 0;
+  const baseTargetSets = baseExercises.reduce((a, ex) => {
+    const sets = parseSets(ex[2]);
+    const hit = (ex[6] || []).some(m => targetMuscles.includes(m));
+    return a + (hit ? sets : 0);
+  }, 0);
+  const baseTotalSets = baseExercises.reduce((a, ex) => a + parseSets(ex[2]), 0);
+  const baseCoverage = baseTotalSets ? Math.round(baseTargetSets / baseTotalSets * 100) : priorityCoverage;
+
+  if (missingAnchors.length) warnings.push({level:'danger', text:`Anchor coverage dropped: ${missingAnchors.length} original anchor lift(s) removed or reclassified.`});
+  if (highFatigueCompounds >= 5) warnings.push({level:'warn', text:`Systemic fatigue is high: ${highFatigueCompounds} high-fatigue compounds in one session.`});
+  if (fatigueDelta >= 10) warnings.push({level:'warn', text:`Session fatigue is up by ${fatigueDelta} points versus the base template.`});
+  if (warmupSets >= 16 || curWarmups.length >= 7) warnings.push({level:'warn', text:`Warm-up volume is getting large. Too much prep can steal glycogen and focus before work sets.`});
+  if (targetMuscles.length && priorityCoverage + 10 < baseCoverage) warnings.push({level:'danger', text:`Priority drift detected: target-muscle coverage is ${priorityCoverage}% vs ${baseCoverage}% in the base day.`});
+  if (!warnings.length) warnings.push({level:'good', text:`Session remains coherent. Priority coverage ${priorityCoverage}% and fatigue delta ${fatigueDelta >= 0 ? '+' : ''}${fatigueDelta}.`});
+
+  return {warnings, fatigueDelta, highFatigueCompounds, warmupSets, priorityCoverage, baseCoverage, missingAnchors};
+}
+function resetDayToBase(dayId) {
+  updateProgramDay(dayId, day => {
+    const base = deepClone(getBaseDay(dayId));
+    day.warmup = base.warmup;
+    day.exercises = base.exercises;
+    day.focus = base.focus;
+    day.notes = base.notes;
+  });
+}
+function applyLibraryTemplate(targetArr, entry, kind='main', dayId='d1') {
+  const lib = findLibraryItem(entry[0], kind);
+  if (!lib) return targetArr;
+  if (kind === 'warmup') {
+    targetArr[0] = lib.name;
+    targetArr[1] = Number(targetArr[1] || lib.sets || 2);
+    targetArr[2] = targetArr[2] || lib.reps || '10–12';
+    targetArr[4] = targetArr[4] || lib.role || 'warmup';
+  } else {
+    targetArr[0] = lib.name;
+    targetArr[1] = targetArr[1] || lib.type || 'compound';
+    targetArr[2] = targetArr[2] || String(lib.sets || '3');
+    targetArr[3] = targetArr[3] || lib.reps || '8–12';
+    targetArr[4] = targetArr[4] || lib.rir || 'RIR 1–2';
+    targetArr[5] = targetArr[5] || lib.tempo || '2-1-1';
+    targetArr[6] = (targetArr[6] && targetArr[6].length) ? targetArr[6] : deepClone(lib.primary || []);
+    targetArr[7] = (targetArr[7] && targetArr[7].length) ? targetArr[7] : deepClone(lib.secondary || []);
+    targetArr[8] = targetArr[8] || lib.substitute || '';
+    targetArr[10] = targetArr[10] || lib.role || defaultExerciseRole(targetArr, targetArr);
+  }
+  return targetArr;
+}
+function addWarmup(dayId) {
+  updateProgramDay(dayId, day => {
+    const base = WARMUP_LIBRARY[0] || {name:'New Warm-up', sets:2, reps:'10–12', role:'warmup'};
+    day.warmup.push([base.name, Number(base.sets || 2), base.reps || '10–12', `${dayId}_wu_${Date.now()}`, base.role || 'warmup']);
+  });
+}
+function addMainExercise(dayId) {
+  updateProgramDay(dayId, day => {
+    const base = MAIN_EXERCISE_LIBRARY[0] || {name:'New Exercise', type:'compound', sets:'3', reps:'8–12', rir:'RIR 1–2', tempo:'2-1-1', primary:['Target muscle'], secondary:[], substitute:'', role:'hypertrophy_compound'};
+    day.exercises.push([base.name, base.type || 'compound', String(base.sets || '3'), base.reps || '8–12', base.rir || 'RIR 1–2', base.tempo || '2-1-1', deepClone(base.primary || ['Target muscle']), deepClone(base.secondary || []), base.substitute || '', `${dayId}_ex_${Date.now()}`, base.role || 'hypertrophy_compound']);
+  });
+}
+const PHASES = {"1": {"label": "Phase 1 — Tissue Prep", "weeks": "Weeks 1–2", "loadPct": "~70–78%", "restComp": "120–150s", "restIso": "45–60s", "failure": "No grinder reps. No compound failure. Isolation only to RIR 1.", "sauna": "1–2× weekly • 8–10 min", "steam": "Optional 1× • 6–8 min", "cns": "Build movement quality, tendon readiness, and repeatability."}, "2": {"label": "Phase 2 — Volume Build", "weeks": "Weeks 3–4", "loadPct": "~72–82%", "restComp": "120–180s", "restIso": "45–75s", "failure": "1 hard isolation set may reach RIR 0. Compounds stay RIR 1–2.", "sauna": "2× weekly • 10–12 min", "steam": "1× weekly • 8–10 min", "cns": "Highest local muscular workload; protect sleep and hydration."}, "3": {"label": "Phase 3 — Neural Build", "weeks": "Weeks 5–6", "loadPct": "~78–88%", "restComp": "150–210s", "restIso": "60–75s", "failure": "Accessories only. Stop compounds before bar speed dies.", "sauna": "1–2× weekly • 8–10 min", "steam": "Optional light steam only", "cns": "Higher neural demand; fewer junk reps, more clean top work."}, "4": {"label": "Phase 4 — Resensitize", "weeks": "Weeks 7–8", "loadPct": "~65–75%", "restComp": "90–150s", "restIso": "45–60s", "failure": "No failure. Leave 2–3 reps in reserve almost everywhere.", "sauna": "1–2× weekly • 8 min", "steam": "1–2× weekly • 8–10 min", "cns": "Drop fatigue, restore joints, regain responsiveness."}, "5": {"label": "Phase 5 — Strength Skill", "weeks": "Weeks 9–10", "loadPct": "~80–90%", "restComp": "180–240s", "restIso": "60–75s", "failure": "No missed reps. One crisp top set, then efficient back-off work.", "sauna": "1× weekly • 8–10 min", "steam": "Optional only after upper days", "cns": "Peak coordination and force without digging a recovery hole."}, "6": {"label": "Phase 6 — Peak Cut", "weeks": "Weeks 11–12", "loadPct": "~72–84%", "restComp": "120–180s", "restIso": "45–60s", "failure": "Pump work okay; compounds stay smooth and submaximal.", "sauna": "1× weekly • 8–10 min max", "steam": "1× weekly • 6–8 min", "cns": "Keep muscle, protect recovery, bias expenditure with easy cardio."}};
+const stateDefaults = {
+  profileName: "Ahmed",
+  priorities: {"Upper chest":"priority","Lats":"priority","Side delts":"build","Triceps":"maintain","Quads":"build","Hamstrings":"build","Glutes":"build","Upper back":"build","Chest":"build"},
+  unit: "kg",
+  week: 1,
+  phase: 1,
+  activeDayId: "d1",
+  screen: "today",
+  logs: {},
+  nutrition: { calories: 2000, protein: 160, carbs: 180, fat: 60, steps: 8000, water: 3, meals: 4, trainingDayCarbs: 180, restDayCarbs: 140, notes:"" },
+  measures: Array.from({length:12}, (_,i)=>({week:i+1, weight:"", waist:"", sleep:"", refeed:"", weekType:"auto", notes:""})),
+  nutritionLog: {},
+  recoveryLog: {},
+  prs: {},
+  sessionLocks: {},
+  customProgram: null,
+  trainingFocusDayId: "d1"
+};
+let state = JSON.parse(JSON.stringify(stateDefaults));
+
+function $(id) { return document.getElementById(id); }
+const memStore = {};
+function storageGet(key) {
+  try { return localStorage.getItem(key); } catch(e) { return memStore[key] ?? null; }
+}
+function storageSet(key, value) {
+  try { localStorage.setItem(key, value); return true; } catch(e) { memStore[key] = value; return false; }
+}
+function toast(msg) {
+  const el = $("toast"); el.textContent = msg; el.classList.add("show");
+  clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove("show"), 1800);
+}
+function save(silent=false) {
+  storageSet(STORAGE_KEY, JSON.stringify(state));
+  if (!silent) toast("Saved");
+}
+
+function ensureStateSchema() {
+  state.nutrition = Object.assign({}, stateDefaults.nutrition, state.nutrition || {});
+  state.nutritionLog = state.nutritionLog || {};
+  state.recoveryLog = state.recoveryLog || {};
+  state.prs = state.prs || {};
+  state.priorities = Object.assign({}, stateDefaults.priorities, state.priorities || {});
+  if (!Array.isArray(state.measures) || state.measures.length !== 12) {
+    const existing = Array.isArray(state.measures) ? state.measures : [];
+    state.measures = Array.from({length:12}, (_,i)=>Object.assign({week:i+1, weight:"", waist:"", sleep:"", refeed:"", weekType:"auto", notes:""}, existing[i] || {}));
+  }
+  state.measures = state.measures.map((m, i) => ({
+    week: i + 1,
+    weight: m?.weight ?? "",
+    waist: m?.waist ?? "",
+    sleep: m?.sleep ?? "",
+    refeed: m?.refeed ?? "",
+    weekType: normalizeWeekType(m?.weekType ?? ((typeof m?.refeed === "string" && m.refeed.trim()) ? m.refeed.trim().toLowerCase() : "auto")),
+    notes: m?.notes ?? ""
+  }));
+  state.week = Math.max(1, Math.min(12, Number(state.week || 1)));
+  state.phase = phaseFromWeek(state.week);
+  state.customProgram = state.customProgram || null;
+  state.trainingFocusDayId = state.trainingFocusDayId || state.activeDayId || "d1";
+}
+
+function load() {
+  const own = storageGet(STORAGE_KEY);
+  if (own) {
+    state = Object.assign(JSON.parse(JSON.stringify(stateDefaults)), JSON.parse(own));
+    ensureStateSchema();
+    loadCustomProgramIntoProgram();
+    return;
+  }
+  for (const key of OLD_KEYS) {
+    const raw = storageGet(key);
+    if (!raw) continue;
+    try {
+      const old = JSON.parse(raw);
+      state.profileName = old.profileName || state.profileName;
+      state.unit = old.unit || state.unit;
+      state.week = old.week || 1;
+      state.phase = phaseFromWeek(state.week);
+      state.activeDayId = old.activeDayId || "d1";
+      state.logs = old.logs || {};
+      state.measures = old.measures || state.measures;
+      state.nutrition = old.nutrition || state.nutrition;
+      ensureStateSchema();
+      loadCustomProgramIntoProgram();
+      storageSet(STORAGE_KEY, JSON.stringify(state));
+      toast("Old data migrated");
+      break;
+    } catch(e) {}
+  }
+}
+function phaseFromWeek(w) { return Math.min(6, Math.max(1, Math.ceil((+w || 1) / 2))); }
+function phaseMod(phaseId) {
+  return {
+    1:{setAdj:0, cardioAdj:0, note:"Base activation volume."},
+    2:{setAdj:1, cardioAdj:2, note:"Add one extra set to the first 1–2 warm-up drills."},
+    3:{setAdj:0, cardioAdj:-2, note:"Keep warm-up crisp; save CNS for work sets."},
+    4:{setAdj:-1, cardioAdj:3, note:"Reduce fatigue and bias mobility."},
+    5:{setAdj:0, cardioAdj:-3, note:"Short sharp primer; long rests before top sets."},
+    6:{setAdj:-1, cardioAdj:4, note:"Minimum effective warm-up; expenditure comes from easy cardio."}
+  }[phaseId];
+}
+function parseSets(v) {
+  const n = parseInt(String(v).match(/\d+/)?.[0] || "0",10);
+  return n > 0 ? n : 3;
+}
+function repBounds(v) {
+  const s = String(v||"").replace(/\s/g, "").replaceAll("–","-");
+  const m = s.match(/^(\d+)-(\d+)$/);
+  if (m) {
+    const min = +m[1], max = +m[2];
+    return {min, max, mid: Math.round((min + max) / 2)};
+  }
+  const one = s.match(/^(\d+)/);
+  if (one) {
+    const val = +one[1];
+    return {min:val, max:val, mid:val};
+  }
+  return {min:null, max:null, mid:null};
+}
+function fmtRange(min,max) {
+  if (min==null && max==null) return "as planned";
+  if (min===max) return String(min);
+  return `${min}–${max}`;
+}
+function getActiveDay() { return PROGRAM.find(d => d.id === state.activeDayId) || PROGRAM[0]; }
+function getLogSlot(week, dayId, exIndex) {
+  state.logs[week] ||= {};
+  state.logs[week][dayId] ||= {};
+  state.logs[week][dayId][exIndex] ||= { startLoad:"", todayLoad:"", nextTarget:"", done:false, note:"" };
+  return state.logs[week][dayId][exIndex];
+}
+function roundToStep(v, step) {
+  const n = Number(v); if (!isFinite(n)) return "";
+  return (Math.round(n / step) * step).toFixed(step < 1 ? 2 : 1).replace(/\.00$/,"").replace(/(\.\d)0$/,"$1");
+}
+function phaseAwareIncrement(type, phaseId) {
+  const table = {
+    1:{compound:0.02, isolation:0.015, mobility:0},
+    2:{compound:0.025, isolation:0.02, mobility:0},
+    3:{compound:0.03, isolation:0.02, mobility:0},
+    4:{compound:0.01, isolation:0.01, mobility:0},
+    5:{compound:0.02, isolation:0.015, mobility:0},
+    6:{compound:0.015, isolation:0.01, mobility:0}
+  };
+  return (table[phaseId] || table[2])[type] ?? 0;
+}
+function suggestNext(load, type, phaseId, weekType=effectiveWeekType(state.week).type) {
+  const n = Number(load); if (!isFinite(n) || n<=0) return "";
+  const inc = phaseAwareIncrement(type, phaseId);
+  const step = state.unit === "kg" ? 0.25 : 0.5;
+  const phys = weekTypePhysiology(weekType, type);
+  const mult = phys.nextTargetMult ?? 1;
+  return roundToStep(n * (1 + inc) * mult, step);
+}
+function adjustRest(rest, secondsAdj=0) {
+  const s = String(rest||"").trim();
+  const m = s.match(/^(\d+)\s*[–-]\s*(\d+)s$/i);
+  if (m) return `${Math.max(20, +m[1] + secondsAdj)}–${Math.max(25, +m[2] + secondsAdj)}s`;
+  const n = s.match(/^(\d+)s$/i);
+  if (n) return `${Math.max(20, +n[1] + secondsAdj)}s`;
+  return s;
+}
+function weekTypePhysiology(weekType='normal', exType='compound') {
+  const isComp = exType === 'compound';
+  const map = {
+    normal: {setMult:1, repShift:0, restAdj:0, rirAdj:0, loadPct:isComp ? 'Base phase load' : 'Base phase load', loadBias:1, nextTargetMult:1, note:'Run the phase prescription as written.'},
+    refeed: {setMult:1, repShift:isComp ? 0 : 1, restAdj:isComp ? -15 : -10, rirAdj:-0.5, loadPct:isComp ? '+1–2% if bar speed is clean' : 'hold load or add reps', loadBias:1.015, nextTargetMult:1.01, note:'Use the extra fuel to improve performance quality, density, and top-end reps without chasing failure.'},
+    deload: {setMult:0.6, repShift:isComp ? -1 : -2, restAdj:isComp ? 20 : 15, rirAdj:1.5, loadPct:isComp ? '-10–15%' : '-8–12%', loadBias:0.88, nextTargetMult:1, note:'Cut fatigue hard: lower volume, lighter loads, longer rests, and leave plenty in reserve.'},
+    'refeed+deload': {setMult:0.55, repShift:isComp ? -1 : -2, restAdj:isComp ? 25 : 20, rirAdj:2, loadPct:isComp ? '-8–12%' : '-5–10%', loadBias:0.9, nextTargetMult:1, note:'Fuel up but still unload stress. Restore glycogen and recovery while keeping movement quality.'}
+  };
+  return map[weekType] || map.normal;
+}
+function shiftRIRText(rirText, adj=0) {
+  const txt = String(rirText || 'RIR 2');
+  if (!adj) return txt;
+  const nums = [...txt.matchAll(/\d+(?:\.\d+)?/g)].map(m=>Number(m[0]));
+  if (!nums.length) return txt;
+  const shifted = nums.map(n => Math.max(0, Math.round((n + adj) * 2) / 2));
+  let i = 0;
+  return txt.replace(/\d+(?:\.\d+)?/g, () => String(shifted[i++]).replace('.0',''));
+}
+function phaseExerciseSpec(ex, day, phaseId, weekType=effectiveWeekType(state.week).type) {
+  const isComp = ex[1] === "compound";
+  const sets = parseSets(ex[2]);
+  const reps = repBounds(ex[3]);
+  let outSets = sets, min = reps.min, max = reps.max, rir = ex[4], rest = isComp ? PHASES[phaseId].restComp : PHASES[phaseId].restIso;
+  let focus = "Standard controlled reps.";
+  if (phaseId===1) { rir = isComp ? "RIR 2–3" : "RIR 1–2"; focus = "Own the position and groove mechanics."; }
+  if (phaseId===2) { outSets = sets + (isComp ? 0 : 1); rir = isComp ? "RIR 1–2" : "RIR 0–1 final set"; focus = "Best hypertrophy density block."; if (!isComp && max!=null) max += 2; }
+  if (phaseId===3) { if (isComp && min!=null) { min=Math.max(3,min-1); max=Math.max(min,max-1); } if (!isComp) outSets=Math.max(2, sets-1); focus = "Explosive concentric intent, longer rests."; }
+  if (phaseId===4) { outSets = Math.max(1, sets-1); rir = "RIR 2–3"; focus = "Resensitize and recover."; }
+  if (phaseId===5) { if (isComp && min!=null) { min=Math.max(3,min-1); max=Math.max(min,max-1); } outSets=Math.max(2, sets-(isComp?0:1)); focus = "Top-set skill, no missed reps."; }
+  if (phaseId===6) { outSets=Math.max(1, sets-1); focus = "Keep muscle, protect recovery."; }
+  const phys = weekTypePhysiology(weekType, ex[1]);
+  outSets = Math.max(1, Math.round(outSets * phys.setMult));
+  if (min!=null) min = Math.max(isComp ? 3 : 6, min + phys.repShift);
+  if (max!=null) max = Math.max(min ?? max, max + phys.repShift);
+  rir = shiftRIRText(rir, phys.rirAdj);
+  rest = adjustRest(rest, phys.restAdj);
+  focus = `${focus} ${phys.note}`;
+  return { sets: outSets, reps: fmtRange(min,max), rir, rest, focus, loadPct: phys.loadPct, loadBias: phys.loadBias, weekType };
+}
+function prescribeLoad(seedLoad, type, phaseId, weekType=effectiveWeekType(state.week).type) {
+  const n = Number(seedLoad); if (!isFinite(n) || n<=0) return '';
+  const phys = weekTypePhysiology(weekType, type);
+  const step = state.unit === 'kg' ? 0.25 : 0.5;
+  return roundToStep(n * phys.loadBias, step);
+}
+function getWarmup(day, phaseId) {
+  const mod = phaseMod(phaseId);
+  return day.warmup.map((w, idx) => {
+    let sets = Math.max(1, w[1] + ((idx < 2) ? mod.setAdj : 0));
+    if (phaseId===6 && idx >= 2) sets = 1;
+    return { name:w[0], sets, reps:w[2] };
+  });
+}
+function getCardio(day, phaseId) {
+  const base = {
+    upperHeavy:12, upperHypertrophy:14, upperPump:12, lowerHeavy:10, lowerAthletic:12, recovery:25
+  }[day.group] || day.cardio.minutes || 12;
+  let mins = Math.max(8, base + phaseMod(phaseId).cardioAdj);
+  if (day.group === "recovery") mins = 20 + (phaseId >= 4 ? 5 : 0);
+  return { type: day.cardio.type, minutes: mins };
+}
+function weekCompletion(week) {
+  const wk = state.logs[week] || {};
+  let total = 0, done = 0;
+  for (const day of PROGRAM) {
+    const exMap = wk[day.id] || {};
+    day.exercises.forEach((_, i) => {
+      total++;
+      if (exMap[i]?.done) done++;
+    });
+  }
+  return total ? Math.round(done / total * 100) : 0;
+}
+function fatigueLevel(dayId, phaseId) {
+  const map = {
+    d1:["High","High","High","Moderate","High","Moderate"],
+    d2:["Moderate","Moderate","Moderate","Low","Moderate","Low-Moderate"],
+    d3:["High","High","High","Moderate","High","Moderate"],
+    d4:["Low-Moderate","Moderate","Moderate","Low","Low-Moderate","Low"],
+    d5:["Moderate","Moderate","Moderate","Low","Moderate","Low-Moderate"],
+    d6:["Moderate","Moderate","Moderate","Low","Moderate","Low-Moderate"],
+    d7:["Very Low","Very Low","Very Low","Very Low","Very Low","Very Low"]
+  };
+  return map[dayId]?.[phaseId-1] || "Moderate";
+}
+function muscleCounts(day) {
+  const counts = {};
+  for (const ex of day.exercises) {
+    for (const m of ex[6]) counts[m] = (counts[m] || 0) + 1;
+  }
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,6);
+}
+
+function allPrimaryMuscles() {
+  const set = new Set();
+  PROGRAM.forEach(day => day.exercises.forEach(ex => (ex[6]||[]).forEach(m => set.add(m))));
+  return Array.from(set).sort();
+}
+function priorityRank(label='build') {
+  return ({priority:3, build:2, maintain:1})[label] || 2;
+}
+function musclePriority(muscle) {
+  return state.priorities?.[muscle] || 'build';
+}
+function projectedSetDoseByMuscle(week=state.week) {
+  const out = {};
+  PROGRAM.forEach(day => day.exercises.forEach(ex => {
+    const spec = v8ExerciseSpec(ex, day, phaseFromWeek(week), effectiveWeekType(week).type, false);
+    (ex[6]||[]).forEach(m => out[m] = (out[m]||0) + spec.sets);
+  }));
+  return out;
+}
+function localMuscleFatigueMap(week=state.week) {
+  const rows = getAllLogRows().filter(r=>r.week===week);
+  const out = {};
+  rows.forEach(r => {
+    const load = r.todayLoad || r.startLoad || r.nextTarget || 0;
+    const mult = r.type==='compound' ? 1.15 : 0.8;
+    (r.primary||[]).forEach(m => out[m] = (out[m]||0) + ((r.done ? r.sets : r.sets*0.35) * mult * (1 + Math.min(1.5, load/100))));
+  });
+  Object.keys(out).forEach(k => out[k] = Math.round(out[k]));
+  return out;
+}
+function classifyLocalFatigue(score=0) {
+  if (score >= 26) return 'High';
+  if (score >= 16) return 'Moderate';
+  return 'Low';
+}
+function readinessScore(day=getActiveDay(), week=state.week) {
+  const b = fatigueBreakdown(week);
+  const local = localMuscleFatigueMap(week);
+  const localHit = day.exercises.reduce((a,ex)=>a+((ex[6]||[]).reduce((x,m)=>x+(local[m]||0),0)/Math.max(1,(ex[6]||[]).length)),0) / Math.max(1,day.exercises.length);
+  const raw = 100 - (b.total*2.1) - Math.min(18, localHit*0.45);
+  return Math.max(25, Math.min(98, Math.round(raw)));
+}
+function readinessLabel(score) {
+  if (score >= 82) return 'Push';
+  if (score >= 68) return 'Normal';
+  if (score >= 52) return 'Conservative';
+  return 'Recovery bias';
+}
+function exerciseTier(ex) {
+  if (ex[1] === 'compound' && parseSets(ex[2]) >= 4) return 'Tier A';
+  if (ex[1] === 'compound' || parseSets(ex[2]) >= 3) return 'Tier B';
+  return 'Tier C';
+}
+function fatigueCost(ex) {
+  const sets = parseSets(ex[2]);
+  const rep = repBounds(ex[3]).mid || 10;
+  const base = ex[1]==='compound' ? 1.5 : 0.9;
+  return Math.round(sets * base * (rep <= 6 ? 1.2 : rep >= 12 ? 0.9 : 1));
+}
+function autoSubstitution(ex, day, week=state.week) {
+  const readiness = readinessScore(day, week);
+  const alt = ex[8] || 'No direct substitution saved';
+  if (readiness >= 68) return alt.split(' • ')[0] || alt;
+  if (exerciseTier(ex) === 'Tier A') return alt.split(' • ')[0] || alt;
+  return alt.split(' • ')[1] || alt.split(' • ')[0] || alt;
+}
+function priorityAwareSetDelta(ex, week=state.week) {
+  const primary = (ex[6]||[])[0];
+  const pr = musclePriority(primary);
+  const local = classifyLocalFatigue(localMuscleFatigueMap(week)[primary] || 0);
+  let delta = 0;
+  if (pr === 'priority' && local === 'Low') delta += 1;
+  if (pr === 'maintain') delta -= 1;
+  if (local === 'High') delta -= 1;
+  return delta;
+}
+function v8ExerciseSpec(ex, day, phaseId, weekType=effectiveWeekType(state.week).type, useReadiness=true) {
+  const spec = phaseExerciseSpec(ex, day, phaseId, weekType);
+  const ready = useReadiness ? readinessScore(day, state.week) : 72;
+  let sets = spec.sets + priorityAwareSetDelta(ex, state.week);
+  let rir = spec.rir;
+  let rest = spec.rest;
+  let focus = spec.focus;
+  if (ready < 55) {
+    sets = Math.max(1, sets - (exerciseTier(ex)==='Tier C' ? 1 : 0));
+    rir = shiftRIRText(rir, 1);
+    rest = adjustRest(rest, 15);
+    focus += ' Smart coach: readiness is low, so preserve quality and drop low-value fatigue.';
+  } else if (ready >= 82 && musclePriority((ex[6]||[])[0]) === 'priority' && ex[1] === 'compound') {
+    focus += ' Smart coach: readiness is high, so priority compounds can push load or one extra back-off set.';
+  }
+  sets = Math.max(1, sets);
+  return Object.assign({}, spec, {sets, rir, rest, focus, readiness: ready, tier: exerciseTier(ex), fatigueCost: fatigueCost(ex)});
+}
+function muscleStats() {
+  const dose = projectedSetDoseByMuscle(state.week);
+  const local = localMuscleFatigueMap(state.week);
+  return allPrimaryMuscles().map(m => ({
+    muscle:m,
+    priority: musclePriority(m),
+    sets: dose[m] || 0,
+    fatigue: local[m] || 0,
+    fatigueLabel: classifyLocalFatigue(local[m] || 0)
+  })).sort((a,b)=>priorityRank(b.priority)-priorityRank(a.priority) || b.sets-a.sets);
+}
+function weeklyCoachReport(week=state.week) {
+  const next = nextWeekRecommendation(week);
+  const stats = muscleStats();
+  const topPriorities = stats.filter(x=>x.priority==='priority').slice(0,4);
+  const underdosed = stats.filter(x=>x.priority!=='maintain' && x.sets < 8).slice(0,4).map(x=>x.muscle);
+  const overdosed = stats.filter(x=>x.fatigueLabel==='High').slice(0,4).map(x=>x.muscle);
+  const improved = computePRs().filter(([,v])=>v.week===week).map(([k])=>k).slice(0,4);
+  const readiness = readinessScore(getActiveDay(), week);
+  const loadIntel = expectedLoadInsights(week);
+  const actions = [];
+  if (next.type.includes('deload')) actions.push('Reduce Tier C accessories first, then trim one set from non-priority isolations.');
+  if (next.type.includes('refeed')) actions.push('Raise carbs around lower or heavy upper days and keep sodium / water steady.');
+  if (readiness < 60) actions.push('Use conservative top sets, add 15–30s rest, and avoid grinding reps.');
+  if (loadIntel.behind.length >= 3) actions.push('Multiple lifts are behind expected load. Hold progression jumps and protect technical quality next week.');
+  if (loadIntel.ahead.length >= 3) actions.push('Several lifts are ahead of forecast. You can push top sets slightly harder on priority compounds.');
+  if (!actions.length) actions.push('Keep the plan as written and chase clean rep quality on Tier A lifts.');
+  let progressionMode = 'Standard';
+  if (next.type.includes('deload') || loadIntel.behind.length >= 4 || loadIntel.avgRatio < 0.97) progressionMode = 'Conservative';
+  else if (loadIntel.ahead.length >= 4 && readiness >= 72 && !next.type.includes('deload')) progressionMode = 'Aggressive';
+  else if (next.type.includes('refeed')) progressionMode = 'Performance-biased';
+  return { next, topPriorities, underdosed, overdosed, improved, readiness, actions, loadIntel, progressionMode };
+}
+function nutritionPrescription(week=state.week) {
+  const n = Object.assign({}, stateDefaults.nutrition, state.nutrition || {});
+  const wt = effectiveWeekType(week).type;
+  const dayType = trainingDayType();
+  let calories = Number(n.calories||0);
+  let carbs = dayType==='lower' ? Number(n.trainingDayCarbs||n.carbs) : dayType==='recovery' ? Number(n.restDayCarbs||n.carbs-30) : Number(n.carbs||0);
+  let fat = Number(n.fat||0);
+  if (wt === 'refeed') { calories += 180; carbs = Math.round(carbs*1.2); fat = Math.max(35, fat-5); }
+  if (wt === 'deload') { calories += 0; carbs = Math.round(carbs*0.92); fat = fat; }
+  if (wt === 'refeed+deload') { calories += 120; carbs = Math.round(carbs*1.12); fat = Math.max(35, fat-8); }
+  const pre = dayType==='lower' ? '60–90 min pre: protein + bigger carb meal.' : '60–90 min pre: protein + moderate carbs.';
+  const post = wt.includes('refeed') ? 'Post: protein + aggressive glycogen refill meal.' : 'Post: protein + controlled carbs, keep fat lower.';
+  return { calories, protein:Number(n.protein||0), carbs, fat, pre, post, water:Number(n.water||3) + (wt.includes('refeed') ? 0.3 : 0), sodium: wt.includes('refeed') ? 'Normal-to-high' : 'Normal' };
+}
+function recoveryPrescription(week=state.week) {
+  const f = fatigueBreakdown(week);
+  const wt = effectiveWeekType(week).type;
+  const ready = readinessScore(getActiveDay(), week);
+  const sleepTarget = wt.includes('deload') || ready < 60 ? '8.0–9.0 h' : '7.5–8.5 h';
+  const sauna = wt==='normal' ? '1–2× weekly, 8–12 min' : wt==='refeed' ? '1× weekly, 8–10 min' : '0–1× weekly, brief only';
+  const steam = wt.includes('deload') ? 'Optional 1×, 6–8 min' : 'Optional after upper / mobility days';
+  const walk = f.total >= 16 ? '15–20 min zone 1' : '20–30 min zone 1–2';
+  const mobility = getActiveDay().id.startsWith('d3') || getActiveDay().id.startsWith('d6') ? '12 min hips + trunk' : '8–10 min shoulders + T-spine';
+  return { sleepTarget, sauna, steam, walk, mobility, hydration:`${nutritionPrescription(week).water.toFixed(1)} L target` };
+}
+function setRangeHtml(obj) {
+  return `${obj.sets} × ${obj.reps}`;
+}
+function renderToday() {
+  const day = getActiveDay();
+  const phase = PHASES[state.phase];
+  const cardio = getCardio(day, state.phase);
+  const lock = getSessionLock(state.week, day.id);
+  const warmup = getWarmup(day, state.phase);
+  const muscles = muscleCounts(day);
+  const ready = readinessScore(day, state.week);
+  const coach = weeklyCoachReport(state.week);
+  const nutr = nutritionPrescription(state.week);
+  const recRx = recoveryPrescription(state.week);
+  $("screen-today").innerHTML = `
+    <div class="hero">
+      <div class="row between">
+        <div>
+          <div class="small">Today</div>
+          <div style="font-size:22px;font-weight:800;line-height:1.1;">${day.name}</div>
+          <div class="small" style="margin-top:6px;">${day.focus}</div>
+        </div>
+        <button class="btn secondary" id="jumpTrainingBtn">Open day</button>
+      </div>
+      <div class="badgeRow">
+        <div class="badge blue">${phase.label}</div>
+        <div class="badge">Week ${state.week}</div>
+        <div class="badge">${effectiveWeekType(state.week).label}</div>
+        <div class="badge ${ready>=68?'good':''}">Readiness ${ready}/100</div>
+        <div class="badge">${readinessLabel(ready)}</div>
+        <div class="badge ${lock?'blue':''}">${lock ? 'Session locked' : 'Session not locked'}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>v8 smart coach</h2>
+      <div class="small">This build adds adaptive volume, local vs systemic fatigue, readiness-based exercise decisions, nutrition linked to training demand, and a weekly coach report. v8.6 adds controlled exercise editing with coach guardrails on anchor lifts, fatigue budget, and priority drift.</div>
+      <div class="kv" style="margin-top:10px;">
+        <div class="slot"><label>Current week type</label><div class="v">${effectiveWeekType(state.week).label}</div></div>
+        <div class="slot"><label>Next week</label><div class="v">${coach.next.label}</div></div>
+        <div class="slot"><label>Readiness</label><div class="v">${readinessLabel(ready)}</div></div>
+      </div>
+    </div>
+
+    <div class="section desktopGrid">
+      <div>
+        <div class="card">
+          <h2>Session controls</h2>
+          <div class="kv">
+            <div class="slot">
+              <label>Week</label>
+              <select id="weekSelect">${Array.from({length:12},(_,i)=>`<option value="${i+1}" ${state.week===i+1?'selected':''}>Week ${i+1}</option>`).join('')}</select>
+            </div>
+            <div class="slot">
+              <label>Phase (auto from week)</label>
+              <div class="v">${phase.label}</div>
+              <div class="small">${phase.weeks}</div>
+            </div>
+            <div class="slot" style="grid-column:1 / -1;">
+              <label>Active day</label>
+              <select id="daySelect">${PROGRAM.map(d=>`<option value="${d.id}" ${state.activeDayId===d.id?'selected':''}>${d.name}</option>`).join('')}</select>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="callout small">Once you start a session, exercises, sets, rep ranges, and rest are frozen for that day/week. Smart coach still updates load, rest, and next-week decisions outside the live session.</div>
+          <div class="quickActions" style="margin-top:10px;">
+            <button class="btn secondary" id="lockSessionBtn">${lock ? 'Finish / unlock session' : 'Start session lock'}</button>
+            <button class="btn primary" id="saveStateBtn">Save</button>
+            <button class="btn" id="exportBtn">Export JSON</button>
+            <button class="btn" id="resetWeekBtn">Reset week</button>
+          </div>
+        </div>
+
+        <div class="card section">
+          <h2>Warm-up</h2>
+          <div class="small">${phaseMod(state.phase).note} Priority: pelvis → core → shoulder/back.</div>
+          <div class="list" style="margin-top:10px;">
+            ${warmup.map(w=>`<div class="dayCard"><div class="row between"><strong>${w.name}</strong><span class="small">${w.sets} × ${w.reps}</span></div></div>`).join('')}
+          </div>
+        </div>
+
+        <div class="card section">
+          <h2>Exercise cards</h2>
+          <div class="list" id="todayExercises"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2>Session lane</h2>
+          <div class="grid2">
+            <div class="slot"><label>Cardio</label><div class="v">${cardio.minutes} min</div><div class="small">${cardio.type}</div></div>
+            <div class="slot"><label>Recovery</label><div class="v">${recRx.sleepTarget}</div><div class="small">${recRx.sauna}</div></div>
+            <div class="slot"><label>Carbs today</label><div class="v">${nutr.carbs}g</div><div class="small">${nutr.pre}</div></div>
+            <div class="slot"><label>Hydration</label><div class="v">${recRx.hydration}</div><div class="small">${nutr.sodium} sodium</div></div>
+          </div>
+          <div class="divider"></div>
+          <div class="small"><strong>Failure policy:</strong> ${phase.failure}</div>
+          <div class="small" style="margin-top:6px;"><strong>Coach reason:</strong> ${smartCoachRecommendation(state.week).reasonText}</div>
+          <div class="small" style="margin-top:6px;"><strong>Next week preview:</strong> ${coach.next.label} for Week ${coach.next.nextWeek} • confidence ${coach.next.confidence}</div>
+          <div class="divider"></div>
+          <div class="small"><strong>Coach actions:</strong></div>
+          <ul class="small" style="padding-left:18px; margin:8px 0 0;">${coach.actions.map(x=>`<li>${x}</li>`).join('')}</ul>
+        </div>
+
+        <div class="card section">
+          <h2>Top muscle emphasis</h2>
+          <div class="list">
+            ${muscles.map(([m,n])=>`<div><div class="row between"><span>${m}</span><span class="small">${n} drills • ${musclePriority(m)}</span></div><div class="progressBar"><span style="width:${Math.min(100, n*20)}%"></span></div></div>`).join('')}
+          </div>
+        </div>
+
+        <div class="card section">
+          <h2>Quick overview</h2>
+          <div class="grid2">
+            <div class="slot"><label>Completion</label><div class="v">${weekCompletion(state.week)}%</div></div>
+            <div class="slot"><label>Week type</label><div class="v">${effectiveWeekType(state.week).label}</div></div>
+            <div class="slot"><label>Systemic fatigue</label><div class="v">${fatigueBreakdown(state.week).total}</div></div>
+            <div class="slot"><label>Compound rest</label><div class="v">${phase.restComp}</div></div>
+            <div class="slot"><label>Recovery walk</label><div class="v">${recRx.walk}</div></div>
+            <div class="slot"><label>Mobility Rx</label><div class="v">${recRx.mobility}</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  $("jumpTrainingBtn").onclick = () => switchScreen("training");
+  $("weekSelect").onchange = e => { state.week = +e.target.value; state.phase = phaseFromWeek(state.week); save(); render(); };
+    $("daySelect").onchange = e => { state.activeDayId = e.target.value; save(); render(); };
+  $("lockSessionBtn").onclick = () => {
+    if (getSessionLock(state.week, day.id)) {
+      if (!confirm(`Finish and unlock ${day.name} for Week ${state.week}?`)) return;
+      unlockCurrentSession();
+      toast('Session unlocked');
+    } else {
+      lockCurrentSession();
+      toast('Session locked — prescription frozen');
+    }
+    render();
+  };
+  $("saveStateBtn").onclick = save;
+  $("resetWeekBtn").onclick = () => {
+    if (!confirm(`Reset logs for week ${state.week}?`)) return;
+    delete state.logs[state.week];
+    save(); render();
+  };
+  $("exportBtn").onclick = exportState;
+  renderExerciseCards("todayExercises", day);
+}
+
+function weekLoggedLoad(week, dayId, idx) {
+  const slot = state.logs?.[week]?.[dayId]?.[idx];
+  const val = Number(slot?.todayLoad || slot?.startLoad || slot?.nextTarget || 0);
+  return isFinite(val) && val > 0 ? val : 0;
+}
+function transitionFactorForWeek(targetWeek, exType) {
+  const wt = effectiveWeekType(targetWeek).type;
+  const phys = weekTypePhysiology(wt, exType);
+  return (1 + phaseAwareIncrement(exType, phaseFromWeek(targetWeek))) * (phys.loadBias || 1);
+}
+function expectedLoadMap(day, ex, idx) {
+  const step = state.unit === 'kg' ? 0.25 : 0.5;
+  const records = {};
+  for (let w = 1; w <= 12; w++) {
+    const actual = weekLoggedLoad(w, day.id, idx);
+    if (actual) records[w] = actual;
+  }
+  const liveSlot = getLogSlot(state.week, day.id, idx);
+  const liveSeed = Number(liveSlot.todayLoad || liveSlot.startLoad || liveSlot.nextTarget || 0);
+  let anchorWeek = Object.keys(records).length ? Math.min(...Object.keys(records).map(Number)) : state.week;
+  let anchorLoad = records[anchorWeek] || (liveSeed > 0 ? liveSeed : 0);
+  if (!anchorLoad) return {};
+  if (!records[anchorWeek] && liveSeed > 0) anchorWeek = state.week;
+  const map = { [anchorWeek]: roundToStep(anchorLoad, step) };
+  for (let w = anchorWeek - 1; w >= 1; w--) {
+    if (records[w]) { map[w] = roundToStep(records[w], step); continue; }
+    const nextVal = map[w + 1] || records[w + 1];
+    map[w] = nextVal ? roundToStep(nextVal / transitionFactorForWeek(w + 1, ex[1]), step) : '';
+  }
+  for (let w = anchorWeek + 1; w <= 12; w++) {
+    if (records[w]) { map[w] = roundToStep(records[w], step); continue; }
+    const prevVal = records[w - 1] || map[w - 1];
+    map[w] = prevVal ? roundToStep(prevVal * transitionFactorForWeek(w, ex[1]), step) : '';
+  }
+  // ensure actual weeks become anchors for the next forecast segment
+  for (let w = 2; w <= 12; w++) {
+    if (records[w]) { map[w] = roundToStep(records[w], step); continue; }
+    const prevVal = records[w - 1] || map[w - 1];
+    if (prevVal) map[w] = roundToStep(prevVal * transitionFactorForWeek(w, ex[1]), step);
+  }
+  return map;
+}
+function expectedLoadForWeek(week, day, ex, idx) {
+  const map = expectedLoadMap(day, ex, idx);
+  return map[week] || '';
+}
+function roadmapBadges(day, ex, idx) {
+  const map = expectedLoadMap(day, ex, idx);
+  return Array.from({length:12}, (_,i) => {
+    const w = i + 1;
+    const val = map[w];
+    const wt = effectiveWeekType(w).label;
+    return `<span class="tag ${w===state.week?'blue':''}">W${w}: ${val || '—'} <span class="small">${wt}</span></span>`;
+  }).join('');
+}
+
+
+function loadStatusFromRatio(ratio) {
+  if (ratio >= 1.035) return { label: "Ahead", cls: "good" };
+  if (ratio >= 0.97) return { label: "On track", cls: "blue" };
+  return { label: "Behind", cls: "warn" };
+}
+function currentVsExpected(day, ex, idx, week=state.week) {
+  const expected = Number(expectedLoadForWeek(week, day, ex, idx) || 0);
+  const slot = getLogSlot(week, day.id, idx);
+  const actual = Number(slot.todayLoad || slot.nextTarget || slot.startLoad || 0);
+  if (!expected || !actual) return { expected, actual, ratio: 1, delta: 0, status: { label: 'No signal', cls: '' } };
+  const ratio = actual / expected;
+  return { expected, actual, ratio, delta: roundToStep(actual - expected, state.unit === 'kg' ? 0.25 : 0.5), status: loadStatusFromRatio(ratio) };
+}
+function recentPerformanceTrend(day, ex, idx, uptoWeek=state.week) {
+  const pts = [];
+  for (let w = Math.max(1, uptoWeek - 2); w <= uptoWeek; w++) {
+    const cmp = currentVsExpected(day, ex, idx, w);
+    if (cmp.expected && cmp.actual) pts.push(cmp.ratio);
+  }
+  if (!pts.length) return { avgRatio: 1, label: 'No trend' };
+  const avgRatio = pts.reduce((a,b)=>a+b,0) / pts.length;
+  return { avgRatio, label: avgRatio >= 1.03 ? 'Running hot' : avgRatio >= 0.97 ? 'Stable' : 'Lagging' };
+}
+function progressionAggressiveness(day, ex, idx, week=state.week) {
+  const cmp = currentVsExpected(day, ex, idx, week);
+  const trend = recentPerformanceTrend(day, ex, idx, week);
+  const wt = effectiveWeekType(week).type;
+  if (!cmp.expected || !cmp.actual) return { label: 'Base progression', note: 'Not enough logged load yet. Follow the standard phase and week-type rules.', factor: 1 };
+  if (wt.includes('deload')) return { label: 'Protective', note: 'Deload logic is active. Keep progression conservative and prioritize technique quality.', factor: 0.5 };
+  if (cmp.ratio >= 1.05 && trend.avgRatio >= 1.02) return { label: 'Aggressive', note: 'You are beating expected loads. Small extra jumps are justified if reps stay clean.', factor: 1.25 };
+  if (cmp.ratio < 0.95 || trend.avgRatio < 0.97) return { label: 'Conservative', note: 'You are behind the forecast. Hold or trim jumps until execution stabilizes.', factor: 0.8 };
+  if (wt === 'refeed') return { label: 'Performance-biased', note: 'Refeed week supports a modest push in reps or load without forcing sloppy grinding.', factor: 1.1 };
+  return { label: 'Standard', note: 'Stay with the default jump size for this lift and phase.', factor: 1 };
+}
+function expectedLoadInsights(week=state.week) {
+  const items = [];
+  PROGRAM.forEach(day => day.exercises.forEach((ex, idx) => {
+    const cmp = currentVsExpected(day, ex, idx, week);
+    const trend = recentPerformanceTrend(day, ex, idx, week);
+    const aggr = progressionAggressiveness(day, ex, idx, week);
+    items.push({ day: day.name, exercise: ex[0], cmp, trend, aggr, tier: exerciseTier(ex), primary: (ex[6]||[])[0] || 'General' });
+  }));
+  const usable = items.filter(x => x.cmp.expected && x.cmp.actual);
+  const ahead = usable.filter(x => x.cmp.ratio >= 1.035).sort((a,b)=>b.cmp.ratio-a.cmp.ratio).slice(0,6);
+  const behind = usable.filter(x => x.cmp.ratio < 0.97).sort((a,b)=>a.cmp.ratio-b.cmp.ratio).slice(0,6);
+  const aggressive = usable.filter(x => x.aggr.label === 'Aggressive').slice(0,6);
+  const conservative = usable.filter(x => x.aggr.label === 'Conservative').slice(0,6);
+  const avgRatio = usable.length ? usable.reduce((a,b)=>a+b.cmp.ratio,0)/usable.length : 1;
+  return { items, usable, ahead, behind, aggressive, conservative, avgRatio };
+}
+function renderExerciseCards(containerId, day) {
+  const wrap = $(containerId);
+  wrap.innerHTML = "";
+  day.exercises.forEach((ex, i) => {
+    const weekType = effectiveWeekType(state.week).type;
+    const spec = sessionSpec(day, ex, i);
+    const slot = getLogSlot(state.week, day.id, i);
+    if (!slot.nextTarget && (slot.todayLoad || slot.startLoad)) slot.nextTarget = suggestNext(slot.todayLoad || slot.startLoad, ex[1], state.phase, weekType);
+    const primary = (ex[6]||[])[0] || 'General';
+    const localFatigue = classifyLocalFatigue(localMuscleFatigueMap(state.week)[primary] || 0);
+    const expectedLoad = expectedLoadForWeek(state.week, day, ex, i);
+    const expectedNext = expectedLoadForWeek(Math.min(12, state.week + 1), day, ex, i);
+    const compare = currentVsExpected(day, ex, i, state.week);
+    const aggr = progressionAggressiveness(day, ex, i, state.week);
+    const roadmap = roadmapBadges(day, ex, i);
+    const box = document.createElement("div");
+    box.className = "exercise";
+    box.innerHTML = `
+      <div class="exHead">
+        <div>
+          <div class="exName">${ex[0]}</div>
+          <div class="exTags">
+            <span class="tag good">${ex[6].join(" • ")}</span>
+            <span class="tag">${ex[1]}</span>
+            <span class="tag blue">${spec.sets} × ${spec.reps}</span>
+            <span class="tag warn">${spec.rir}</span>
+            <span class="tag">${weekTypeLabel(spec.weekType || weekType)}</span>
+            <span class="tag">${spec.tier}</span>
+            <span class="tag ${spec.locked ? 'blue' : ''}">${spec.locked ? 'Locked session' : 'Adaptive live'}</span>
+          </div>
+        </div>
+        <label class="tag blue"><input type="checkbox" data-done ${slot.done ? 'checked' : ''} /> Done</label>
+      </div>
+      <div class="exBody">
+        <div class="cols">
+          <div class="chipInput"><label>Tempo</label><div>${ex[5]}</div></div>
+          <div class="chipInput"><label>Rest</label><div>${spec.rest}</div></div>
+        </div>
+        ${spec.locked ? `<div class="callout small">Session snapshot active. Sets / reps / rest / RIR are frozen from the moment you started this session. Smart coach will apply new adjustments next session, not mid-workout.</div>` : ''}
+        <div class="miniGrid">
+          <div class="chipInput"><label>Start load (${state.unit})</label><input type="number" step="0.25" data-start value="${slot.startLoad}"></div>
+          <div class="chipInput"><label>Expected load — W${state.week} (${state.unit})</label><div>${expectedLoad || '—'}</div></div>
+          <div class="chipInput"><label>Today load (${state.unit})</label><input type="number" step="0.25" data-today value="${slot.todayLoad}"></div>
+          <div class="chipInput"><label>Next target (${state.unit})</label><input type="number" step="0.25" data-next value="${slot.nextTarget}"></div>
+          <div class="chipInput"><label>Expected next — W${Math.min(12, state.week + 1)} (${state.unit})</label><div>${expectedNext || '—'}</div></div>
+          <div class="chipInput"><label>Vs expected</label><div>${compare.expected && compare.actual ? `${compare.delta>=0?'+':''}${compare.delta} ${state.unit} • <span class="${compare.status.cls}">${compare.status.label}</span>` : '—'}</div></div>
+          <div class="chipInput"><label>Progression mode</label><div>${aggr.label}</div></div>
+          <div class="chipInput"><label>Prescribed load (${state.unit})</label><div>${prescribeLoad(slot.todayLoad || slot.startLoad || expectedLoad || slot.nextTarget, ex[1], state.phase, weekType) || '—'}</div></div>
+          <div class="chipInput"><label>Fatigue cost</label><div>${spec.fatigueCost}</div></div>
+          <div class="chipInput"><label>Local fatigue</label><div>${localFatigue}</div></div>
+          <div class="chipInput"><label>Priority</label><div>${musclePriority(primary)}</div></div>
+          <div class="chipInput"><label>Substitution</label><div class="small">${autoSubstitution(ex, day, state.week)}</div></div>
+        </div>
+        <div class="chipInput">
+          <label>Adaptive coaching focus</label>
+          <div class="small">${spec.focus}</div>
+        </div>
+        <div class="chipInput" style="margin-top:10px;">
+          <label>Expected-load intelligence</label>
+          <div class="small">${aggr.note}</div>
+        </div>
+        <details style="margin-top:10px;">
+          <summary style="cursor:pointer;font-weight:700;">Expected loads • all 12 weeks</summary>
+          <div class="badgeRow" style="margin-top:10px;">${roadmap}</div>
+          <div class="small" style="margin-top:8px;">Forecast uses your logged history first, then phase progression, week type physiology, and current exercise type.</div>
+        </details>
+        <textarea class="note" placeholder="Technique notes, RPE, cues..." data-note>${slot.note || ""}</textarea>
+        <div class="toolbar">
+          <button class="btn" data-fill>Auto next target</button>
+          <button class="btn secondary" data-useexpected>Use expected load</button>
+          <button class="btn secondary" data-copy>Copy W1→W12 roadmap</button>
+        </div>
+      </div>
+    `;
+    box.querySelector("[data-done]").onchange = e => { slot.done = e.target.checked; save(); renderProgress(); renderRecovery(); renderCoach(); };
+    box.querySelector("[data-start]").oninput = e => { slot.startLoad = e.target.value; save(); };
+    box.querySelector("[data-today]").oninput = e => { slot.todayLoad = e.target.value; save(); };
+    box.querySelector("[data-next]").oninput = e => { slot.nextTarget = e.target.value; save(); };
+    box.querySelector("[data-note]").oninput = e => { slot.note = e.target.value; save(); };
+    box.querySelector("[data-fill]").onclick = () => { slot.nextTarget = suggestNext(slot.todayLoad || slot.startLoad || expectedLoad, ex[1], state.phase, weekType); save(); render(); };
+    box.querySelector("[data-useexpected]").onclick = () => { slot.todayLoad = expectedLoad; if (!slot.nextTarget) slot.nextTarget = expectedNext; save(); render(); };
+    box.querySelector("[data-copy]").onclick = () => {
+      const seed = Number(slot.todayLoad || slot.startLoad || expectedLoad || slot.nextTarget);
+      if (!seed) { toast("Enter a load first"); return; }
+      let cur = seed; const lines = [];
+      for (let w=1; w<=12; w++) {
+        const ph = phaseFromWeek(w);
+        if (w===1) cur = seed; else if (ph===4) cur *= 0.94; else if (ph===6) cur *= 0.985; else cur *= 1 + phaseAwareIncrement(ex[1], ph);
+        lines.push(`W${w} ${roundToStep(cur, state.unit==='kg'?0.25:0.5)}`);
+      }
+      navigator.clipboard.writeText(`${ex[0]} → ` + lines.join(" | "));
+      toast("Roadmap copied");
+    };
+    wrap.appendChild(box);
+  });
+}
+
+
+function renderTraining() {
+  const stats = muscleStats();
+  const warmupOptions = WARMUP_LIBRARY.map(x=>`<option value="${x.name}"></option>`).join('');
+  const mainOptions = MAIN_EXERCISE_LIBRARY.map(x=>`<option value="${x.name}"></option>`).join('');
+  $("screen-training").innerHTML = `
+    <datalist id="warmup-library">${warmupOptions}</datalist>
+    <datalist id="exercise-library">${mainOptions}</datalist>
+    <div class="card">
+      <h2>Training days + editor</h2>
+      <div class="small">v8.6 Option B keeps coach-defined session goals, but the owner can now add, remove, reorder, and edit warm-ups or main exercises inside guardrails. Smart validation warns when you drift away from anchor lifts, target muscles, or fatigue budget.</div>
+    </div>
+    <div class="card section">
+      <h2>Muscle priorities</h2>
+      <div class="small">Priority muscles receive more sets when fatigue allows. Maintain muscles are the first place smart coach trims fatigue.</div>
+      <div class="list" id="priorityList"></div>
+    </div>
+    <div class="dayJumpBar">
+      <div class="card">
+        <div class="row between" style="margin-bottom:8px;">
+          <strong>Jump to training day</strong>
+          <button class="btn ghost" id="expandAllDaysBtn">Toggle all</button>
+        </div>
+        <div class="jumpScroller" id="trainingDayJump"></div>
+      </div>
+    </div>
+    <div class="section list" id="trainingDays"></div>
+  `;
+  const pWrap = $("priorityList");
+  stats.slice(0,10).forEach(row => {
+    const el = document.createElement('div');
+    el.className = 'dayCard';
+    el.innerHTML = `<div class="row between"><div><strong>${row.muscle}</strong><div class="small">${row.sets} projected sets • fatigue ${row.fatigueLabel}</div></div><select data-muscle="${row.muscle}"><option value="priority" ${row.priority==='priority'?'selected':''}>Priority</option><option value="build" ${row.priority==='build'?'selected':''}>Build</option><option value="maintain" ${row.priority==='maintain'?'selected':''}>Maintain</option></select></div>`;
+    el.querySelector('select').onchange = e => { state.priorities[row.muscle] = e.target.value; save(); render(); };
+    pWrap.appendChild(el);
+  });
+
+  const jumpWrap = $("trainingDayJump");
+  const focusDayId = state.trainingFocusDayId || state.activeDayId || PROGRAM[0]?.id;
+  PROGRAM.forEach(day => {
+    const b = document.createElement('button');
+    b.className = 'btn jumpChip' + (focusDayId === day.id ? ' secondary' : '');
+    b.textContent = day.name;
+    b.onclick = () => {
+      state.trainingFocusDayId = day.id;
+      save(true);
+      renderTraining();
+      requestAnimationFrame(() => document.querySelector(`[data-day-anchor="${day.id}"]`)?.scrollIntoView({behavior:'smooth', block:'start'}));
+    };
+    jumpWrap.appendChild(b);
+  });
+  $("expandAllDaysBtn").onclick = () => {
+    const expand = state.trainingFocusDayId !== '__all__';
+    state.trainingFocusDayId = expand ? '__all__' : '__summary__';
+    save(true);
+    renderTraining();
+    toast(expand ? 'All training days expanded' : 'Training days collapsed to summaries');
+  };
+
+  const wrap = $("trainingDays");
+  PROGRAM.forEach(day => {
+    const isActive = day.id === state.activeDayId;
+    const cardio = getCardio(day, state.phase);
+    const analysis = dayDesignAnalysis(day);
+    const locked = isSessionLocked(state.week, day.id);
+    const expanded = (state.trainingFocusDayId || state.activeDayId || PROGRAM[0]?.id) === '__all__' || (state.trainingFocusDayId || state.activeDayId || PROGRAM[0]?.id) === day.id;
+    const item = document.createElement("div");
+    item.className = "dayCard" + (isActive ? " active" : "");
+    item.dataset.dayAnchor = day.id;
+    const tierA = day.exercises.filter(ex => exerciseTier(ex)==='Tier A').length;
+    item.innerHTML = `
+      <div class="row between">
+        <div>
+          <div style="font-size:15px;font-weight:750;">${day.name}</div>
+          <div class="small" style="margin-top:4px;">${day.focus}</div>
+        </div>
+        <div class="daySummaryActions">
+          <button class="btn ghost" data-toggle-day>${expanded ? 'Collapse' : 'Expand'}</button>
+          <button class="btn secondary" data-use-day>Use</button>
+        </div>
+      </div>
+      <div class="badgeRow" style="margin-top:10px;">
+        <div class="badge">${day.exercises.length} exercises</div>
+        <div class="badge">${day.warmup.length} warm-ups</div>
+        <div class="badge">${tierA} Tier A</div>
+        <div class="badge blue">${cardio.minutes} min cardio</div>
+        <div class="badge ${analysis.fatigueDelta <= 0 ? 'good' : ''}">Fatigue Δ ${analysis.fatigueDelta >= 0 ? '+' : ''}${analysis.fatigueDelta}</div>
+        <div class="badge ${analysis.priorityCoverage >= analysis.baseCoverage ? 'good' : ''}">Priority coverage ${analysis.priorityCoverage}%</div>
+        <div class="badge ${locked ? 'warn' : 'blue'}">${locked ? 'Locked this week' : 'Editable'}</div>
+      </div>
+      <div class="${expanded ? '' : 'dayBodyCollapsed'}">
+      <div class="list" style="margin-top:10px;">
+        ${analysis.warnings.map(w => `<div class="callout small" style="${w.level==='danger' ? 'border-color:rgba(255,109,122,.45);' : w.level==='warn' ? 'border-color:rgba(255,191,71,.45);' : 'border-color:rgba(79,213,168,.35);'}">${w.text}</div>`).join('')}
+      </div>
+      <div class="toolbar" style="margin-top:10px;">
+        <button class="btn" data-add-warmup ${locked?'disabled':''}>Add warm-up</button>
+        <button class="btn" data-add-main ${locked?'disabled':''}>Add main exercise</button>
+        <button class="btn ghost" data-reset-day ${locked?'disabled':''}>Reset day</button>
+      </div>
+      <div class="section">
+        <h3>Warm-ups</h3>
+        <div class="list">
+          ${day.warmup.map((w, idx) => `
+            <div class="exercise">
+              <div class="exHead">
+                <div><div class="exName">Warm-up ${idx+1}</div><div class="small">Low-fatigue prep. Keep local activation high and systemic cost low.</div></div>
+                <div class="tag ${Number(w[1]) >= 4 ? 'warn' : 'good'}">${w[1]} sets</div>
+              </div>
+              <div class="exBody">
+                <div class="miniGrid">
+                  <div class="chipInput"><label>Name</label><input list="warmup-library" data-kind="warmup" data-field="name" data-day="${day.id}" data-index="${idx}" value="${w[0]}" ${locked?'disabled':''}></div>
+                  <div class="chipInput"><label>Role</label><select data-kind="warmup" data-field="role" data-day="${day.id}" data-index="${idx}" ${locked?'disabled':''}><option value="warmup" ${(w[4]||'warmup')==='warmup'?'selected':''}>Warm-up</option><option value="mobility" ${(w[4]||'warmup')==='mobility'?'selected':''}>Mobility</option><option value="primer" ${(w[4]||'warmup')==='primer'?'selected':''}>Primer</option></select></div>
+                  <div class="chipInput"><label>Sets</label><input type="number" min="1" max="6" data-kind="warmup" data-field="sets" data-day="${day.id}" data-index="${idx}" value="${w[1]}" ${locked?'disabled':''}></div>
+                  <div class="chipInput"><label>Reps / duration</label><input data-kind="warmup" data-field="reps" data-day="${day.id}" data-index="${idx}" value="${w[2]}" ${locked?'disabled':''}></div>
+                </div>
+                <div class="toolbar">
+                  <button class="btn ghost" data-move="up" data-kind="warmup" data-day="${day.id}" data-index="${idx}" ${locked || idx===0?'disabled':''}>↑</button>
+                  <button class="btn ghost" data-move="down" data-kind="warmup" data-day="${day.id}" data-index="${idx}" ${locked || idx===day.warmup.length-1?'disabled':''}>↓</button>
+                  <button class="btn ghost" data-remove data-kind="warmup" data-day="${day.id}" data-index="${idx}" ${locked?'disabled':''}>Remove</button>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="section">
+        <h3>Main exercises</h3>
+        <div class="list">
+          ${day.exercises.map((ex, idx) => `
+            <div class="exercise">
+              <div class="exHead">
+                <div>
+                  <div class="exName">${ex[0]}</div>
+                  <div class="exTags">
+                    <span class="tag blue">${ex[10] || defaultExerciseRole(ex, idx)}</span>
+                    <span class="tag">${ex[1]}</span>
+                    <span class="tag ${exerciseTier(ex)==='Tier A' ? 'warn' : 'good'}">${exerciseTier(ex)}</span>
+                  </div>
+                </div>
+                <div class="tag ${fatigueCost(ex) >= 8 ? 'warn' : 'good'}">fatigue ${fatigueCost(ex)}</div>
+              </div>
+              <div class="exBody">
+                <div class="miniGrid">
+                  <div class="chipInput"><label>Name</label><input list="exercise-library" data-kind="main" data-field="name" data-day="${day.id}" data-index="${idx}" value="${ex[0]}" ${locked?'disabled':''}></div>
+                  <div class="chipInput"><label>Role</label><select data-kind="main" data-field="role" data-day="${day.id}" data-index="${idx}" ${locked?'disabled':''}><option value="anchor_compound" ${(ex[10]||defaultExerciseRole(ex, idx))==='anchor_compound'?'selected':''}>Anchor compound</option><option value="hypertrophy_compound" ${(ex[10]||defaultExerciseRole(ex, idx))==='hypertrophy_compound'?'selected':''}>Hypertrophy compound</option><option value="isolation" ${(ex[10]||defaultExerciseRole(ex, idx))==='isolation'?'selected':''}>Isolation</option><option value="finisher" ${(ex[10]||defaultExerciseRole(ex, idx))==='finisher'?'selected':''}>Finisher</option><option value="mobility" ${(ex[10]||defaultExerciseRole(ex, idx))==='mobility'?'selected':''}>Mobility / recovery</option></select></div>
+                  <div class="chipInput"><label>Type</label><select data-kind="main" data-field="type" data-day="${day.id}" data-index="${idx}" ${locked?'disabled':''}><option value="compound" ${ex[1]==='compound'?'selected':''}>Compound</option><option value="isolation" ${ex[1]==='isolation'?'selected':''}>Isolation</option><option value="mobility" ${ex[1]==='mobility'?'selected':''}>Mobility</option></select></div>
+                  <div class="chipInput"><label>Sets</label><input type="number" min="1" max="8" data-kind="main" data-field="sets" data-day="${day.id}" data-index="${idx}" value="${parseSets(ex[2])}" ${locked?'disabled':''}></div>
+                  <div class="chipInput"><label>Reps</label><input data-kind="main" data-field="reps" data-day="${day.id}" data-index="${idx}" value="${ex[3]}" ${locked?'disabled':''}></div>
+                  <div class="chipInput"><label>RIR</label><input data-kind="main" data-field="rir" data-day="${day.id}" data-index="${idx}" value="${ex[4]}" ${locked?'disabled':''}></div>
+                  <div class="chipInput"><label>Tempo</label><input data-kind="main" data-field="tempo" data-day="${day.id}" data-index="${idx}" value="${ex[5]}" ${locked?'disabled':''}></div>
+                  <div class="chipInput"><label>Substitute</label><input data-kind="main" data-field="substitute" data-day="${day.id}" data-index="${idx}" value="${ex[8] || ''}" ${locked?'disabled':''}></div>
+                  <div class="chipInput" style="grid-column:1 / -1;"><label>Primary muscles (comma separated)</label><input data-kind="main" data-field="primary" data-day="${day.id}" data-index="${idx}" value="${musclesInputValue(ex[6])}" ${locked?'disabled':''}></div>
+                  <div class="chipInput" style="grid-column:1 / -1;"><label>Secondary muscles (comma separated)</label><input data-kind="main" data-field="secondary" data-day="${day.id}" data-index="${idx}" value="${musclesInputValue(ex[7])}" ${locked?'disabled':''}></div>
+                </div>
+                <div class="toolbar">
+                  <button class="btn ghost" data-move="up" data-kind="main" data-day="${day.id}" data-index="${idx}" ${locked || idx===0?'disabled':''}>↑</button>
+                  <button class="btn ghost" data-move="down" data-kind="main" data-day="${day.id}" data-index="${idx}" ${locked || idx===day.exercises.length-1?'disabled':''}>↓</button>
+                  <button class="btn ghost" data-remove data-kind="main" data-day="${day.id}" data-index="${idx}" ${locked?'disabled':''}>Remove</button>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      </div>
+    `;
+    item.querySelector("[data-toggle-day]").onclick = () => {
+      state.trainingFocusDayId = (state.trainingFocusDayId === '__all__' || state.trainingFocusDayId === day.id) ? '__summary__' : day.id;
+      save(true);
+      renderTraining();
+      requestAnimationFrame(() => document.querySelector(`[data-day-anchor="${day.id}"]`)?.scrollIntoView({behavior:'smooth', block:'start'}));
+    };
+    item.querySelector("[data-use-day]").onclick = () => { state.activeDayId = day.id; save(); switchScreen("today"); };
+    item.querySelector("[data-add-warmup]")?.addEventListener('click', () => addWarmup(day.id));
+    item.querySelector("[data-add-main]")?.addEventListener('click', () => addMainExercise(day.id));
+    item.querySelector("[data-reset-day]")?.addEventListener('click', () => resetDayToBase(day.id));
+
+    item.querySelectorAll("[data-remove]").forEach(btn => btn.onclick = () => {
+      updateProgramDay(btn.dataset.day, dayRef => {
+        const kind = btn.dataset.kind;
+        const idx = Number(btn.dataset.index);
+        if (kind === 'warmup') dayRef.warmup.splice(idx, 1);
+        else dayRef.exercises.splice(idx, 1);
+      });
+    });
+    item.querySelectorAll("[data-move]").forEach(btn => btn.onclick = () => {
+      updateProgramDay(btn.dataset.day, dayRef => {
+        const idx = Number(btn.dataset.index);
+        const dir = btn.dataset.move === 'up' ? -1 : 1;
+        const arr = btn.dataset.kind === 'warmup' ? dayRef.warmup : dayRef.exercises;
+        const to = idx + dir;
+        if (to < 0 || to >= arr.length) return;
+        [arr[idx], arr[to]] = [arr[to], arr[idx]];
+      });
+    });
+    item.querySelectorAll("input[data-field], select[data-field]").forEach(el => {
+      const handler = () => {
+        updateProgramDay(el.dataset.day, dayRef => {
+          const idx = Number(el.dataset.index);
+          const kind = el.dataset.kind;
+          const field = el.dataset.field;
+          const arr = kind === 'warmup' ? dayRef.warmup[idx] : dayRef.exercises[idx];
+          if (!arr) return;
+          if (kind === 'warmup') {
+            if (field === 'name') {
+              arr[0] = el.value.trim() || arr[0];
+              const lib = findLibraryItem(arr[0], 'warmup');
+              if (lib) { arr[1] = Number(lib.sets || 2); arr[2] = lib.reps || '10–12'; arr[4] = arr[4] || lib.role || 'warmup'; }
+            } else if (field === 'sets') arr[1] = Math.max(1, Number(el.value || 1));
+            else if (field === 'reps') arr[2] = el.value;
+            else if (field === 'role') arr[4] = el.value;
+          } else {
+            if (field === 'name') {
+              arr[0] = el.value.trim() || arr[0];
+              const lib = findLibraryItem(arr[0], 'main');
+              if (lib) {
+                arr[1] = lib.type || 'compound';
+                arr[2] = String(lib.sets || '3');
+                arr[3] = lib.reps || '8–12';
+                arr[4] = lib.rir || 'RIR 1–2';
+                arr[5] = lib.tempo || '2-1-1';
+                arr[6] = deepClone(lib.primary || []);
+                arr[7] = deepClone(lib.secondary || []);
+                arr[8] = lib.substitute || '';
+                arr[10] = arr[10] || lib.role || defaultExerciseRole(arr, idx);
+              }
+            } else if (field === 'type') arr[1] = el.value;
+            else if (field === 'sets') arr[2] = String(Math.max(1, Number(el.value || 1)));
+            else if (field === 'reps') arr[3] = el.value;
+            else if (field === 'rir') arr[4] = el.value;
+            else if (field === 'tempo') arr[5] = el.value;
+            else if (field === 'primary') arr[6] = parseMusclesInput(el.value);
+            else if (field === 'secondary') arr[7] = parseMusclesInput(el.value);
+            else if (field === 'substitute') arr[8] = el.value;
+            else if (field === 'role') arr[10] = el.value;
+          }
+        });
+      };
+      el.onchange = handler;
+      if (el.tagName === 'INPUT') el.onblur = handler;
+    });
+    wrap.appendChild(item);
+  });
+}
+function getAllLogRows() {
+  const rows = [];
+  Object.entries(state.logs || {}).forEach(([week, days]) => {
+    Object.entries(days || {}).forEach(([dayId, arr]) => {
+      const day = PROGRAM.find(d => d.id === dayId);
+      Object.entries(arr || {}).forEach(([idx, slot]) => {
+        const ex = day?.exercises?.[idx];
+        if (!ex || !slot || typeof slot !== 'object') return;
+        rows.push({
+          week:+week,
+          dayId,
+          dayName: day.name,
+          exercise: ex[0],
+          type: ex[1],
+          sets: parseSets(ex[2]),
+          primary: ex[6] || [],
+          todayLoad: Number(slot?.todayLoad || 0),
+          startLoad: Number(slot?.startLoad || 0),
+          nextTarget: Number(slot?.nextTarget || 0),
+          done: !!slot?.done
+        });
+      });
+    });
+  });
+  return rows;
+}
+function estimateVolume(row) {
+  const load = row.todayLoad || row.startLoad || row.nextTarget || 0;
+  const reps = repBounds(PROGRAM.find(d=>d.id===row.dayId)?.exercises?.find(e=>e[0]===row.exercise)?.[3] || '10').mid || 10;
+  return row.done ? Math.round(load * row.sets * reps) : 0;
+}
+function computePRs() {
+  const best = {};
+  getAllLogRows().forEach(r => {
+    const load = r.todayLoad || r.startLoad || r.nextTarget;
+    if (!load) return;
+    if (!best[r.exercise] || load > best[r.exercise].load) best[r.exercise] = {load, week:r.week, dayName:r.dayName, type:r.type};
+  });
+  return Object.entries(best).sort((a,b)=>b[1].load-a[1].load);
+}
+function currentWeekRows() { return getAllLogRows().filter(r=>r.week===state.week); }
+function volumeByDay(week=state.week) {
+  const map = {};
+  getAllLogRows().filter(r=>r.week===week).forEach(r => map[r.dayId]=(map[r.dayId]||0)+estimateVolume(r));
+  return PROGRAM.map(d=>({label:d.name.replace('Day ','D').split(' — ')[0], value:Math.round(map[d.id]||0), full:d.name})).filter(x=>x.value>0 || x.label.startsWith('D'));
+}
+function strongestLifts(limit=6) {
+  return computePRs().slice(0, limit);
+}
+function fatigueScoreForWeek(week=state.week) {
+  const rows = getAllLogRows().filter(r=>r.week===week && r.done);
+  let score = 0;
+  rows.forEach(r => {
+    const base = r.type==='compound' ? 2.4 : r.type==='isolation' ? 1.1 : .6;
+    const loadFactor = r.todayLoad ? Math.min(2.5, r.todayLoad / 40) : .8;
+    score += base * loadFactor;
+  });
+  return Math.round(score);
+}
+function fatigueTrend() {
+  return Array.from({length:12}, (_,i)=>({week:i+1, score: fatigueBreakdown(i+1).total}));
+}
+function adherencePct(week=state.week) {
+  const rows = getAllLogRows().filter(r=>r.week===week);
+  const total = rows.length;
+  const done = rows.filter(r=>r.done).length;
+  return total ? Math.round(done/total*100) : 0;
+}
+function calcMacroKcal(n) { return (n.protein||0)*4 + (n.carbs||0)*4 + (n.fat||0)*9; }
+function trainingDayType() {
+  const g = getActiveDay().group;
+  if (g.includes('lower')) return 'lower';
+  if (g.includes('upperHeavy')) return 'upperHeavy';
+  if (g.includes('upper')) return 'upper';
+  return 'recovery';
+}
+function latestPRSummary() {
+  const prs = computePRs();
+  if (!prs.length) return 'No PRs logged yet — enter today load and mark exercises done.';
+  const [name, data] = prs[0];
+  return `${name} • ${data.load} ${state.unit} in week ${data.week}`;
+}
+function weeklyRecoveryEntry(week=state.week) {
+  const base = {sleep: '', soreness: '', stress: '', water: '', sauna: '', steam: '', steps: '', notes: ''};
+  return Object.assign(base, state.recoveryLog?.[week] || {});
+}
+function currentMeasure(week=state.week) {
+  return state.measures[week-1] || state.measures[0];
+}
+function selectedWeekType(week=state.week) {
+  return normalizeWeekType(currentMeasure(week)?.weekType || 'auto');
+}
+function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+function fatigueBreakdown(week=state.week) {
+  const rec = weeklyRecoveryEntry(week);
+  const n = Object.assign({}, stateDefaults.nutrition, state.nutrition || {});
+  const training = fatigueScoreForWeek(week);
+  const sleep = Number(rec.sleep || currentMeasure(week)?.sleep || 0);
+  const soreness = Number(rec.soreness || 0);
+  const stress = Number(rec.stress || 0);
+  const water = Number(rec.water || 0);
+  const steps = Number(rec.steps || 0);
+  const sauna = Number(rec.sauna || 0);
+  const steam = Number(rec.steam || 0);
+  const sleepPenalty = sleep ? clamp((7.5 - sleep) * 2.2, 0, 8) : 2;
+  const sorenessPenalty = clamp(soreness * 1.2, 0, 12);
+  const stressPenalty = clamp(stress * 1.1, 0, 11);
+  const hydrationPenalty = clamp((Number(n.water || 3) - water) * 1.6, 0, 6);
+  const stepLoad = clamp((steps - Number(n.steps || 8000)) / 2500, 0, 5);
+  const heatLoad = clamp(sauna * 0.9 + steam * 0.6, 0, 6);
+  const manualType = selectedWeekType(week);
+  const weekAdjMap = {auto:0, normal:0, refeed:-2.5, deload:-5, 'refeed+deload':-7};
+  const weekAdjustment = weekAdjMap[manualType] ?? 0;
+  const total = Math.max(0, Math.round(training + sleepPenalty + sorenessPenalty + stressPenalty + hydrationPenalty + stepLoad + heatLoad + weekAdjustment));
+  return {
+    total,
+    training: Math.round(training),
+    sleepPenalty: Math.round(sleepPenalty*10)/10,
+    sorenessPenalty: Math.round(sorenessPenalty*10)/10,
+    stressPenalty: Math.round(stressPenalty*10)/10,
+    hydrationPenalty: Math.round(hydrationPenalty*10)/10,
+    stepLoad: Math.round(stepLoad*10)/10,
+    heatLoad: Math.round(heatLoad*10)/10,
+    weekAdjustment: Math.round(weekAdjustment*10)/10,
+    inputs: {sleep,soreness,stress,water,steps,sauna,steam}
+  };
+}
+function weekTypeLabel(type) {
+  const normalized = normalizeWeekType(type);
+  const map = {normal:'Normal', refeed:'Refeed', deload:'Deload', 'refeed+deload':'Refeed + Deload', auto:'Auto'};
+  return map[normalized] || 'Auto';
+}
+
+function sessionKey(week=state.week, dayId=getActiveDay().id) { return `w${week}_${dayId}`; }
+function getSessionLock(week=state.week, dayId=getActiveDay().id) {
+  return (state.sessionLocks || {})[sessionKey(week, dayId)] || null;
+}
+function isSessionLocked(week=state.week, dayId=getActiveDay().id) { return !!getSessionLock(week, dayId); }
+function buildSessionSnapshot(day, week=state.week) {
+  const weekType = effectiveWeekType(week).type;
+  const phase = state.phase;
+  return {
+    key: sessionKey(week, day.id),
+    week, dayId: day.id, phase, weekType,
+    startedAt: new Date().toISOString(),
+    readiness: readinessScore(day, week),
+    exercises: day.exercises.map(ex => {
+      const spec = v8ExerciseSpec(ex, day, phase, weekType, true);
+      return { sets: spec.sets, reps: spec.reps, rir: spec.rir, rest: spec.rest, focus: spec.focus, readiness: spec.readiness, tier: spec.tier, fatigueCost: spec.fatigueCost, weekType: spec.weekType };
+    })
+  };
+}
+function lockCurrentSession() {
+  const day = getActiveDay();
+  state.sessionLocks = state.sessionLocks || {};
+  state.sessionLocks[sessionKey(state.week, day.id)] = buildSessionSnapshot(day, state.week);
+  save();
+}
+function unlockCurrentSession() {
+  const day = getActiveDay();
+  if (state.sessionLocks) delete state.sessionLocks[sessionKey(state.week, day.id)];
+  save();
+}
+function sessionSpec(day, ex, idx) {
+  const lock = getSessionLock(state.week, day.id);
+  if (lock && lock.exercises && lock.exercises[idx]) return Object.assign({}, lock.exercises[idx], {locked:true, lockedWeekType:lock.weekType, lockedReadiness:lock.readiness, startedAt:lock.startedAt});
+  return Object.assign({}, v8ExerciseSpec(ex, day, state.phase, effectiveWeekType(state.week).type, true), {locked:false});
+}
+function recentWeeks(endWeek=state.week, count=3) {
+  const start = Math.max(1, endWeek - count + 1);
+  return Array.from({length: endWeek - start + 1}, (_,i)=>start+i);
+}
+function recentPRCount(endWeek=state.week, count=2) {
+  const start = Math.max(1, endWeek - count + 1);
+  return computePRs().filter(([,data]) => data.week >= start && data.week <= endWeek).length;
+}
+function smartCoachRecommendation(week=state.week) {
+  const b = fatigueBreakdown(week);
+  const reasons = [];
+  if (b.training >= 10) reasons.push('training load is high this week');
+  if (b.sleepPenalty >= 3) reasons.push('7-day sleep average is too low');
+  if (b.sorenessPenalty >= 6) reasons.push('soreness is elevated');
+  if (b.stressPenalty >= 6) reasons.push('stress is elevated');
+  if (b.hydrationPenalty >= 2) reasons.push('hydration is below target');
+  if (b.heatLoad >= 3) reasons.push('sauna / steam load is non-trivial');
+  if (b.stepLoad >= 2) reasons.push('extra steps are adding recovery cost');
+  let type = 'normal';
+  let label = 'Normal';
+  if (b.total >= 24 || ((b.sleepPenalty >= 3 || b.stressPenalty >= 6) && b.sorenessPenalty >= 6)) {
+    type = 'refeed+deload';
+    label = 'Refeed + Deload';
+  } else if (b.total >= 18 || b.sorenessPenalty >= 8) {
+    type = 'deload';
+    label = 'Deload';
+  } else if (b.total >= 12 || b.sleepPenalty >= 3) {
+    type = 'refeed';
+    label = 'Refeed';
+  }
+  const reasonText = reasons.length ? reasons.join(' • ') : 'fatigue is in a normal range and recovery inputs look acceptable';
+  return { type, label, reasonText, breakdown: b };
+}
+function nextWeekRecommendation(fromWeek=state.week) {
+  const lastWeeks = recentWeeks(fromWeek, 3);
+  const snapshots = lastWeeks.map(w => ({
+    week: w,
+    fatigue: fatigueBreakdown(w),
+    completion: weekCompletion(w),
+    adherence: adherencePct(w),
+    recovery: weeklyRecoveryEntry(w),
+    effective: effectiveWeekType(w).type,
+    prs: recentPRCount(w, 1)
+  }));
+  const current = snapshots[snapshots.length - 1];
+  const prev = snapshots[snapshots.length - 2] || current;
+  const avgFatigue = snapshots.reduce((a,s)=>a+s.fatigue.total,0) / Math.max(1,snapshots.length);
+  const avgCompletion = snapshots.reduce((a,s)=>a+s.completion,0) / Math.max(1,snapshots.length);
+  const risingFatigue = current.fatigue.total - prev.fatigue.total;
+  const lowSleepStreak = snapshots.filter(s => Number(s.recovery.sleep || currentMeasure(s.week)?.sleep || 0) && Number(s.recovery.sleep || currentMeasure(s.week)?.sleep || 0) < 6.6).length;
+  const highStressStreak = snapshots.filter(s => Number(s.recovery.stress || 0) >= 6).length;
+  const highSorenessStreak = snapshots.filter(s => Number(s.recovery.soreness || 0) >= 6).length;
+  const poorHydrationStreak = snapshots.filter(s => s.fatigue.hydrationPenalty >= 2).length;
+  const noRecentPRs = snapshots.reduce((a,s)=>a+s.prs,0) === 0;
+  const needsResetAfterDeload = current.effective === 'deload' || current.effective === 'refeed+deload';
+  let type = 'normal';
+  const reasons = [];
+  if (needsResetAfterDeload && current.fatigue.total <= 10) {
+    type = 'normal';
+    reasons.push('this week already reduced fatigue, so next week can return to normal loading');
+  } else if (current.fatigue.total >= 20 || (avgFatigue >= 17 && risingFatigue >= 2) || ((lowSleepStreak >= 2 || highStressStreak >= 2) && highSorenessStreak >= 1)) {
+    type = 'refeed+deload';
+    reasons.push('fatigue is persistently high across recent weeks');
+  } else if (current.fatigue.total >= 16 || avgFatigue >= 14 || highSorenessStreak >= 2 || (risingFatigue >= 3 && current.completion >= 70)) {
+    type = 'deload';
+    reasons.push('fatigue trend suggests recovery debt is accumulating');
+  } else if (current.fatigue.total >= 11 || avgFatigue >= 10 || lowSleepStreak >= 2 || poorHydrationStreak >= 2 || (noRecentPRs && avgCompletion >= 75)) {
+    type = 'refeed';
+    reasons.push('performance or recovery looks flat enough to justify more fuel');
+  } else {
+    type = 'normal';
+    reasons.push('fatigue and recovery trend support another normal week');
+  }
+  if (current.completion < 45) reasons.push('current-week completion is low, so keep next week conservative');
+  if (current.prs > 0 && current.fatigue.total <= 9) reasons.push('recent PRs suggest readiness is still acceptable');
+  const confidence = current.completion >= 70 ? 'high' : current.completion >= 40 ? 'medium' : 'low';
+  const nextWeek = Math.min(12, fromWeek + 1);
+  return {
+    nextWeek,
+    type,
+    label: weekTypeLabel(type),
+    confidence,
+    reasonText: reasons.join(' • '),
+    context: {
+      avgFatigue: Math.round(avgFatigue*10)/10,
+      avgCompletion: Math.round(avgCompletion),
+      risingFatigue,
+      lowSleepStreak,
+      highStressStreak,
+      highSorenessStreak,
+      noRecentPRs
+    }
+  };
+}
+function effectiveWeekType(week=state.week) {
+  const manual = selectedWeekType(week);
+  if (manual && manual !== 'auto') return { type: manual, label: weekTypeLabel(manual), auto:false };
+  const reco = smartCoachRecommendation(week);
+  return { type: normalizeWeekType(reco.type), label: reco.label, auto:true };
+}
+function refeedCarbBoost(baseCarbs, week=state.week) {
+  const wt = effectiveWeekType(week).type;
+  if (wt === 'refeed' || wt === 'refeed+deload') return Math.round(baseCarbs * 1.22);
+  return baseCarbs;
+}
+
+function renderProgress() {
+  const completion = weekCompletion(state.week);
+  const prs = computePRs();
+  const strongest = strongestLifts(8);
+  const vol = volumeByDay(state.week);
+  const maxVol = Math.max(1, ...vol.map(v=>v.value));
+  const fatigue = fatigueTrend();
+  const maxFatigue = Math.max(1, ...fatigue.map(f=>f.score));
+  const thisFatigue = fatigue.find(f=>f.week===state.week)?.score || 0;
+  const prevFatigue = fatigue.find(f=>f.week===Math.max(1,state.week-1))?.score || 0;
+  const delta = thisFatigue - prevFatigue;
+  const report = weeklyCoachReport(state.week);
+  const mStats = muscleStats();
+  $("screen-progress").innerHTML = `
+    <div class="card">
+      <h2>PR + analytics</h2>
+      <div class="small">v8 adds a weekly coach report, muscle stats 2.0, and performance intelligence that decides where to push and where to trim fatigue.</div>
+      <div class="statGrid3" style="margin-top:12px;">
+        <div class="slot"><label>Week completion</label><div class="v">${completion}%</div></div>
+        <div class="slot"><label>Fatigue score</label><div class="v">${thisFatigue}</div></div>
+        <div class="slot"><label>PR count</label><div class="v">${prs.length}</div></div>
+      </div>
+      <div class="badgeRow">
+        <div class="badge blue">${PHASES[state.phase].label}</div>
+        <div class="badge">${effectiveWeekType(state.week).label}${effectiveWeekType(state.week).auto ? ' • auto' : ' • manual'}</div>
+        <div class="badge">Adherence ${adherencePct(state.week)}%</div>
+        <div class="badge ${delta<=0?'good':''}">Fatigue ${delta>=0?'+':''}${delta}</div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Weekly coach report</h2>
+      <div class="small">This report blends readiness, fatigue trend, PR behavior, and muscle priorities to decide what the next week should look like.</div>
+      <div class="grid2" style="margin-top:12px;">
+        <div class="slot"><label>Next week type</label><div class="v">${report.next.label}</div><div class="small">Week ${report.next.nextWeek} • ${report.next.confidence} confidence</div></div>
+        <div class="slot"><label>Session readiness</label><div class="v">${report.readiness}</div><div class="small">${readinessLabel(report.readiness)}</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="small"><strong>Improved lifts:</strong> ${report.improved.length ? report.improved.join(' • ') : 'No new PR signal yet'}</div>
+      <div class="small" style="margin-top:6px;"><strong>Underdosed muscles:</strong> ${report.underdosed.length ? report.underdosed.join(' • ') : 'None flagged'}</div>
+      <div class="small" style="margin-top:6px;"><strong>Overdosed / fatigued muscles:</strong> ${report.overdosed.length ? report.overdosed.join(' • ') : 'None flagged'}</div>
+      <ul class="small" style="padding-left:18px; margin:10px 0 0;">${report.actions.map(x=>`<li>${x}</li>`).join('')}</ul>
+    </div>
+
+    <div class="card section">
+      <h2>Volume by day</h2>
+      ${vol.map(v=>`<div style="margin:12px 0;"><div class="row between"><span>${v.full}</span><span class="small">${v.value}</span></div><div class="progressBar"><span style="width:${(v.value/maxVol)*100}%"></span></div></div>`).join('')}
+    </div>
+
+    <div class="card section">
+      <h2>Fatigue trend</h2>
+      ${fatigue.map(f=>`<div style="margin:12px 0;"><div class="row between"><span>Week ${f.week}</span><span class="small">${f.score}</span></div><div class="progressBar"><span style="width:${(f.score/maxFatigue)*100}%"></span></div></div>`).join('')}
+    </div>
+
+    <div class="card section">
+      <h2>Strongest lifts</h2>
+      <div class="list">
+        ${strongest.length ? strongest.map(([name, d])=>`<div class="dayCard"><div class="row between"><div><strong>${name}</strong><div class="small">${d.dayName}</div></div><div style="text-align:right;"><div>${d.load} ${state.unit}</div><div class="small">Week ${d.week}</div></div></div></div>`).join('') : '<div class="small">Log loads to populate this list.</div>'}
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Muscle stats 2.0</h2>
+      <div class="small">Projected direct sets, priority level, and local fatigue by muscle.</div>
+      <div class="list" style="margin-top:12px;">
+        ${mStats.map(m=>`<div class="dayCard"><div class="row between"><div><strong>${m.muscle}</strong><div class="small">${m.priority} • fatigue ${m.fatigueLabel}</div></div><div style="text-align:right;"><div>${m.sets} sets</div><div class="small">score ${m.fatigue}</div></div></div></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Weekly check-in</h2>
+      <div class="small">All avg fields below are 7-day weekly averages, not single-day entries.</div>
+      <div class="miniGrid" style="margin-top:12px;">
+        <div class="chipInput"><label>Bodyweight</label><input type="number" step="0.1" id="measureWeight" value="${(state.measures[state.week-1]||{}).weight||''}"></div>
+        <div class="chipInput"><label>Waist</label><input type="number" step="0.1" id="measureWaist" value="${(state.measures[state.week-1]||{}).waist||''}"></div>
+        <div class="chipInput"><label>Sleep avg (7-day)</label><input type="number" step="0.1" id="measureSleep" value="${(state.measures[state.week-1]||{}).sleep||''}"></div>
+        <div class="chipInput"><label>Week type</label><select id="measureWeekType"><option value="auto" ${(currentMeasure(state.week).weekType||'auto')==='auto'?'selected':''}>Auto</option><option value="normal" ${currentMeasure(state.week).weekType==='normal'?'selected':''}>Normal</option><option value="refeed" ${currentMeasure(state.week).weekType==='refeed'?'selected':''}>Refeed</option><option value="deload" ${currentMeasure(state.week).weekType==='deload'?'selected':''}>Deload</option><option value="refeed+deload" ${currentMeasure(state.week).weekType==='refeed+deload'?'selected':''}>Refeed + Deload</option></select></div>
+        <div class="chipInput" style="grid-column:1 / -1;"><label>Notes</label><textarea id="measureNotes">${(state.measures[state.week-1]||{}).notes||''}</textarea></div>
+      </div>
+      <div class="toolbar"><button class="btn primary" id="saveMeasureBtn">Save check-in</button></div>
+      <div class="divider"></div>
+      <table>
+        <thead><tr><th>Week</th><th>Weight</th><th>Waist</th><th>Sleep avg</th><th>Week type</th></tr></thead>
+        <tbody>${state.measures.map(m=>`<tr><td>W${m.week}</td><td>${m.weight||'—'}</td><td>${m.waist||'—'}</td><td>${m.sleep||'—'}</td><td>${(m.weekType||'auto').replace('refeed+deload','Refeed + Deload')}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+  `;
+  $("saveMeasureBtn").onclick = () => {
+    state.measures[state.week-1] = { week: state.week, weight: $("measureWeight").value, waist: $("measureWaist").value, sleep: $("measureSleep").value, refeed: $("measureWeekType").value, weekType: $("measureWeekType").value, notes: $("measureNotes").value };
+    save(); renderProgress(); renderRecovery(); renderCoach(); renderToday();
+  };
+}
+
+function renderNutrition() {
+  const n = Object.assign({}, stateDefaults.nutrition, state.nutrition || {});
+  const p = nutritionPrescription(state.week);
+  const macroKcal = calcMacroKcal(n);
+  const diff = (n.calories||0) - macroKcal;
+  $("screen-nutrition").innerHTML = `
+    <div class="card">
+      <h2>Nutrition system</h2>
+      <div class="small">v8 links calories and carbs to the current week type, the active day, and recovery demand. Refeed and deload weeks now change the feeding prescription, not just the label.</div>
+      <div class="statGrid3" style="margin-top:12px;">
+        <div class="slot"><label>Calories today</label><div class="v">${p.calories}</div></div>
+        <div class="slot"><label>Protein</label><div class="v">${p.protein}g</div></div>
+        <div class="slot"><label>Carbs today</label><div class="v">${p.carbs}g</div></div>
+      </div>
+      <div class="badgeRow">
+        <div class="badge blue">${effectiveWeekType(state.week).label}</div>
+        <div class="badge">${trainingDayType()}</div>
+        <div class="badge">Water ${p.water.toFixed(1)}L</div>
+        <div class="badge">Sodium ${p.sodium}</div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Practical feeding setup</h2>
+      <div class="grid2">
+        <div class="slot"><label>Pre-workout</label><div class="small">${p.pre}</div></div>
+        <div class="slot"><label>Post-workout</label><div class="small">${p.post}</div></div>
+        <div class="slot"><label>Fat target</label><div class="v">${p.fat}g</div></div>
+        <div class="slot"><label>Meal split</label><div class="v">${n.meals} meals</div></div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Base targets</h2>
+      <div class="miniGrid">
+        <div class="chipInput"><label>Calories</label><input type="number" id="nutCalories" value="${n.calories}"></div>
+        <div class="chipInput"><label>Protein</label><input type="number" id="nutProtein" value="${n.protein}"></div>
+        <div class="chipInput"><label>Carbs</label><input type="number" id="nutCarbs" value="${n.carbs}"></div>
+        <div class="chipInput"><label>Fat</label><input type="number" id="nutFat" value="${n.fat}"></div>
+        <div class="chipInput"><label>Training-day carbs</label><input type="number" id="nutTrainCarbs" value="${n.trainingDayCarbs}"></div>
+        <div class="chipInput"><label>Rest-day carbs</label><input type="number" id="nutRestCarbs" value="${n.restDayCarbs}"></div>
+        <div class="chipInput"><label>Water (L)</label><input type="number" step="0.1" id="nutWater" value="${n.water}"></div>
+        <div class="chipInput"><label>Steps target</label><input type="number" id="nutSteps" value="${n.steps}"></div>
+        <div class="chipInput"><label>Meals</label><input type="number" id="nutMeals" value="${n.meals}"></div>
+        <div class="chipInput" style="grid-column:1 / -1;"><label>Notes</label><textarea id="nutNotes">${n.notes||''}</textarea></div>
+      </div>
+      <div class="toolbar"><button class="btn primary" id="saveNutritionBtn">Save nutrition</button></div>
+      <div class="divider"></div>
+      <div class="small">Macro kcal from base targets: ${macroKcal} kcal ${diff ? `• difference vs target ${diff>0?'+':''}${diff}` : ''}</div>
+    </div>
+  `;
+  $("saveNutritionBtn").onclick = () => {
+    state.nutrition = { calories:+$("nutCalories").value||0, protein:+$("nutProtein").value||0, carbs:+$("nutCarbs").value||0, fat:+$("nutFat").value||0, trainingDayCarbs:+$("nutTrainCarbs").value||0, restDayCarbs:+$("nutRestCarbs").value||0, water:+$("nutWater").value||0, steps:+$("nutSteps").value||0, meals:+$("nutMeals").value||0, notes:$("nutNotes").value||'' };
+    save(); renderNutrition(); renderRecovery(); renderToday();
+  };
+}
+
+function renderRecovery() {
+  const day = getActiveDay();
+  const phase = PHASES[state.phase];
+  const cardio = getCardio(day, state.phase);
+  const rec = weeklyRecoveryEntry(state.week);
+  const ready = readinessScore(day, state.week);
+  const bd = fatigueBreakdown(state.week);
+  const rx = recoveryPrescription(state.week);
+  $("screen-recovery").innerHTML = `
+    <div class="card">
+      <h2>Recovery</h2>
+      <div class="small">v8 separates systemic fatigue from local muscular fatigue and converts recovery into an actionable prescription.</div>
+      <div class="statGrid3" style="margin-top:12px;">
+        <div class="slot"><label>Readiness</label><div class="v">${ready}</div></div>
+        <div class="slot"><label>Systemic fatigue</label><div class="v">${bd.total}</div></div>
+        <div class="slot"><label>Cardio today</label><div class="v">${cardio.minutes}m</div></div>
+      </div>
+      <div class="badgeRow">
+        <div class="badge blue">${phase.label}</div>
+        <div class="badge">${effectiveWeekType(state.week).label}</div>
+        <div class="badge ${ready>=70?'good':''}">${readinessLabel(ready)}</div>
+        <div class="badge">${rx.sleepTarget}</div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Recovery prescription</h2>
+      <div class="grid2">
+        <div class="slot"><label>Sleep target</label><div class="v">${rx.sleepTarget}</div></div>
+        <div class="slot"><label>Hydration</label><div class="v">${rx.hydration}</div></div>
+        <div class="slot"><label>Sauna</label><div class="small">${rx.sauna}</div></div>
+        <div class="slot"><label>Steam</label><div class="small">${rx.steam}</div></div>
+        <div class="slot"><label>Walk</label><div class="small">${rx.walk}</div></div>
+        <div class="slot"><label>Mobility</label><div class="small">${rx.mobility}</div></div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Weekly recovery log</h2><div class="small">All avg fields below are 7-day weekly averages, not single-day entries.</div>
+      <div class="miniGrid">
+        <div class="chipInput"><label>Sleep avg (7-day weekly avg hours)</label><input type="number" step="0.1" id="recSleep" value="${rec.sleep}"></div>
+        <div class="chipInput"><label>Soreness / 10</label><input type="number" step="1" id="recSoreness" value="${rec.soreness}"></div>
+        <div class="chipInput"><label>Stress / 10</label><input type="number" step="1" id="recStress" value="${rec.stress}"></div>
+        <div class="chipInput"><label>Water avg (L)</label><input type="number" step="0.1" id="recWater" value="${rec.water}"></div>
+        <div class="chipInput"><label>Sauna sessions</label><input type="number" step="1" id="recSauna" value="${rec.sauna}"></div>
+        <div class="chipInput"><label>Steam sessions</label><input type="number" step="1" id="recSteam" value="${rec.steam}"></div>
+        <div class="chipInput"><label>Steps avg</label><input type="number" step="100" id="recSteps" value="${rec.steps}"></div>
+        <div class="chipInput" style="grid-column:1 / -1;"><label>Notes</label><textarea id="recNotes">${rec.notes}</textarea></div>
+      </div>
+      <div class="toolbar"><button class="btn primary" id="saveRecoveryBtn">Save recovery log</button></div>
+    </div>
+
+    <div class="card section">
+      <h2>Fatigue breakdown</h2>
+      <div class="list">
+        ${[['Training load',bd.training],['Sleep penalty',bd.sleepPenalty],['Soreness penalty',bd.sorenessPenalty],['Stress penalty',bd.stressPenalty],['Hydration penalty',bd.hydrationPenalty],['Step load',bd.stepLoad],['Heat load',bd.heatLoad],['Week-type adjustment',bd.weekAdjustment]].map(([n,v])=>`<div><div class="row between"><span>${n}</span><span class="small">${v}</span></div><div class="progressBar"><span style="width:${Math.min(100, Math.abs(v)*10)}%"></span></div></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Local muscular fatigue</h2>
+      <div class="list">${muscleStats().map(m=>`<div class="dayCard"><div class="row between"><div><strong>${m.muscle}</strong><div class="small">${m.priority}</div></div><div style="text-align:right;"><div>${m.fatigue}</div><div class="small">${m.fatigueLabel}</div></div></div></div>`).join('')}</div>
+    </div>
+  `;
+  $("saveRecoveryBtn").onclick = () => {
+    state.recoveryLog[state.week] = { sleep:$("recSleep").value, soreness:$("recSoreness").value, stress:$("recStress").value, water:$("recWater").value, sauna:$("recSauna").value, steam:$("recSteam").value, steps:$("recSteps").value, notes:$("recNotes").value };
+    save(); renderRecovery(); renderProgress(); renderCoach(); renderToday();
+  };
+}
+
+
+function inferExerciseClass(ex) {
+  const name = (ex[0] || '').toLowerCase();
+  const type = ex[1] || 'compound';
+  if (type === 'isolation') return 'Isolation';
+  if (/machine|supported|cable row|pulldown|prayer/.test(name)) return 'Stable compound';
+  if (/squat|deadlift|barbell|row|pull-up|hip thrust|press|rdl/.test(name)) return 'Free-weight / high-skill compound';
+  return type === 'compound' ? 'Compound' : 'Accessory';
+}
+function historicalLoadForExercise(dayId, exIndex, uptoWeek=state.week-1) {
+  let best = null;
+  for (let w = Math.max(1, uptoWeek); w >= 1; w--) {
+    const slot = state.logs?.[w]?.[dayId]?.[exIndex];
+    const raw = Number(slot?.todayLoad || slot?.startLoad || 0);
+    if (isFinite(raw) && raw > 0) {
+      best = { week:w, load:raw, done:!!slot?.done };
+      break;
+    }
+  }
+  return best;
+}
+function startLoadDecision(day, ex, exIndex, week=state.week) {
+  const slot = getLogSlot(week, day.id, exIndex);
+  const manual = Number(slot.startLoad || 0);
+  const today = Number(slot.todayLoad || 0);
+  const hist = historicalLoadForExercise(day.id, exIndex, week-1);
+  const sourceLoad = manual || hist?.load || today || 0;
+  const prescribed = sourceLoad ? prescribeLoad(sourceLoad, ex[1], state.phase, effectiveWeekType(week).type) : '';
+  const wk = effectiveWeekType(week).type;
+  const rules = {
+    normal:'Use the closest conservative load that should hit the first work set at the listed RIR. Keep 1 small plate in reserve if uncertain.',
+    refeed:'Start from your recent successful load, then only bias upward if bar speed and control are clearly better after warm-ups.',
+    deload:'Use ~85–90% of your normal week entry load and keep every rep crisp. The goal is recovery, not testing.',
+    'refeed+deload':'Use deload loading with slightly better fuel availability. Treat it as recovery-quality work, not a push week.'
+  };
+  const exClass = inferExerciseClass(ex);
+  const classRule = exClass === 'Isolation'
+    ? 'For isolations, choose the lowest load that lets you fully control the target muscle through the full range.'
+    : exClass === 'Stable compound'
+    ? 'For stable compounds, you can start slightly closer to working load because balance cost is lower.'
+    : 'For free-weight/high-skill compounds, build through 3–5 ramp-up sets before fixing the first work-set load.';
+  return {
+    source: manual ? 'Current week manual start load' : hist ? `Historical load from week ${hist.week}` : today ? 'Current week today load' : 'No historical load yet',
+    sourceLoad,
+    prescribed,
+    weekRule: rules[wk] || rules.normal,
+    classRule,
+    wk,
+    exClass
+  };
+}
+function renderLoadGuide() {
+  const day = getActiveDay();
+  const wt = effectiveWeekType(state.week);
+  const examples = day.exercises.slice(0,6).map((ex, i) => {
+    const d = startLoadDecision(day, ex, i, state.week);
+    return `<div class="dayCard"><div class="row between"><div><strong>${ex[0]}</strong><div class="small">${d.exClass} • ${ex[1]}</div></div><div style="text-align:right;"><div>${d.prescribed || 'Set manually'}</div><div class="small">prescribed start</div></div></div><div class="small" style="margin-top:8px;">Source: ${d.source}${d.sourceLoad ? ` (${d.sourceLoad}${state.unit})` : ''}</div><div class="small" style="margin-top:6px;">${d.classRule}</div></div>`;
+  }).join('');
+  $("screen-loadguide").innerHTML = `
+    <div class="card">
+      <h2>Start load guide</h2>
+      <div class="small">Use this page to decide the <strong>start load</strong> for any exercise. In GymOS, start load means the load you expect to open your first real work set with after warm-up sets — not your empty-bar ramp-up load.</div>
+      <div class="badgeRow" style="margin-top:10px;">
+        <div class="badge blue">Week ${state.week}</div>
+        <div class="badge">${wt.label}</div>
+        <div class="badge">Phase ${PHASES[state.phase].label}</div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Decision order</h2>
+      <div class="list">
+        <div class="dayCard"><strong>1) Use your own history first</strong><div class="small" style="margin-top:6px;">If the same exercise has a successful load in previous weeks, that is the best seed. The app checks old <em>today load</em> or <em>start load</em> first.</div></div>
+        <div class="dayCard"><strong>2) Let week type modify it</strong><div class="small" style="margin-top:6px;">Normal = base load. Refeed = slight upward performance bias. Deload = reduce the entry load and keep higher RIR. Refeed + Deload = reduced load with good fuel.</div></div>
+        <div class="dayCard"><strong>3) Respect exercise class</strong><div class="small" style="margin-top:6px;">Free-weight compounds need more conservative entries and more ramp-up sets. Machine/supported compounds can start a little closer. Isolation work starts from clean control, not ego load.</div></div>
+        <div class="dayCard"><strong>4) First work set decides</strong><div class="small" style="margin-top:6px;">If set 1 is clearly too easy or too hard versus the prescribed RIR, adjust the remaining sets. The first work set is your calibration set.</div></div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Week-type rules</h2>
+      <div class="list">
+        <div class="dayCard"><strong>Normal week</strong><div class="small" style="margin-top:6px;">Choose the load that should hit the programmed reps at the programmed RIR. Example: if the card says 4×6 @ RIR 2, your start load should make set 1 feel like you had about 2 reps left.</div></div>
+        <div class="dayCard"><strong>Refeed week</strong><div class="small" style="margin-top:6px;">Use your recent successful load, then add only a small push if sleep, glycogen, and bar speed are clearly improved. Most compounds should only move up slightly; isolations may hold load and gain reps instead.</div></div>
+        <div class="dayCard"><strong>Deload week</strong><div class="small" style="margin-top:6px;">Entry loads should usually come down to roughly 85–90% of a normal week. The goal is lower fatigue, better technique, and lower joint stress.</div></div>
+        <div class="dayCard"><strong>Refeed + Deload</strong><div class="small" style="margin-top:6px;">Keep the deload logic for load selection, but expect better recovery and bar speed because nutrition is restored. Do not turn this into a testing week.</div></div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>How to choose start load when you have no history</h2>
+      <div class="list">
+        <div class="dayCard"><strong>Compounds</strong><div class="small" style="margin-top:6px;">Ramp with 3–5 sets: empty implement → ~40% → ~60% → ~75% → ~85% of your guessed work set. Then open the first work set conservatively. If set 1 beats the target RIR by a lot, adjust up on set 2.</div></div>
+        <div class="dayCard"><strong>Stable compounds</strong><div class="small" style="margin-top:6px;">Use 2–4 warm-up jumps, then start with a load you are very confident you can own technically. Machines and chest-supported patterns usually tolerate a slightly more assertive start.</div></div>
+        <div class="dayCard"><strong>Isolations</strong><div class="small" style="margin-top:6px;">Pick the lowest load that gives the intended muscle a clean full range and the programmed reps. If you need momentum, the start load is too high.</div></div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Live examples from today</h2>
+      <div class="small">These examples use your current week, current phase, current week type, and any historical data already logged in the app.</div>
+      <div class="list" style="margin-top:10px;">${examples}</div>
+    </div>
+
+    <div class="card section">
+      <h2>What to write in each field</h2>
+      <div class="list">
+        <div class="dayCard"><strong>Start load</strong><div class="small" style="margin-top:6px;">Your planned opening work-set load for that exercise today.</div></div>
+        <div class="dayCard"><strong>Today load</strong><div class="small" style="margin-top:6px;">The load you actually used once the session happened. This becomes the strongest historical input for future weeks.</div></div>
+        <div class="dayCard"><strong>Next target</strong><div class="small" style="margin-top:6px;">The app's forward suggestion after phase and week-type logic. Use it only if your current week execution matched the intended RIR and quality.</div></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCoach() {
+  const report = weeklyCoachReport(state.week);
+  const next = report.next;
+  $("screen-coach").innerHTML = `
+    <div class="card">
+      <h2>Adaptive coaching intelligence</h2>
+      <div class="small">This is the v8.5 decision layer. It now combines historical training, readiness, fatigue, recovery, and expected-load accuracy into direct coaching decisions.</div>
+      <div class="statGrid3" style="margin-top:12px;">
+        <div class="slot"><label>This week</label><div class="v">${effectiveWeekType(state.week).label}</div></div>
+        <div class="slot"><label>Next week</label><div class="v">${next.label}</div></div>
+        <div class="slot"><label>Confidence</label><div class="v">${next.confidence}</div></div>
+      </div>
+      <div class="badgeRow"><div class="badge blue">Week ${state.week}</div><div class="badge">Readiness ${report.readiness}</div><div class="badge">Adherence ${adherencePct(state.week)}%</div></div>
+    </div>
+
+    <div class="card section">
+      <h2>What smart coach sees</h2>
+      <div class="small">${next.reasonText}</div>
+      <ul class="small" style="padding-left:18px; margin:10px 0 0;">${report.actions.map(x=>`<li>${x}</li>`).join('')}</ul>
+    </div>
+
+    <div class="card section">
+      <h2>Expected-load intelligence</h2>
+      <div class="small">Smart coach now checks whether your actual load is ahead of or behind the forecast before deciding how aggressive next jumps should be.</div>
+      <div class="list">${[...report.loadIntel.ahead.slice(0,3).map(x=>`<div class="dayCard"><strong>${x.exercise}</strong><div class="small">Ahead by ${Math.round((x.cmp.ratio-1)*100)}% • ${x.day}</div></div>`), ...report.loadIntel.behind.slice(0,3).map(x=>`<div class="dayCard"><strong>${x.exercise}</strong><div class="small">Behind by ${Math.round((1-x.cmp.ratio)*100)}% • ${x.day}</div></div>`)].join('') || '<div class="dayCard"><div class="small">No enough logged comparisons yet.</div></div>'}</div>
+    </div>
+
+    <div class="card section">
+      <h2>Priority muscles</h2>
+      <div class="list">${report.topPriorities.map(x=>`<div class="dayCard"><div class="row between"><div><strong>${x.muscle}</strong><div class="small">${x.priority}</div></div><div style="text-align:right;"><div>${x.sets} sets</div><div class="small">fatigue ${x.fatigueLabel}</div></div></div></div>`).join('')}</div>
+    </div>
+
+    <div class="card section">
+      <h2>Auto-substitution rules</h2>
+      <div class="small">When readiness is low, Tier C exercises are swapped first. Tier A compounds keep the closest pattern-specific substitute.</div>
+      <div class="list">${PROGRAM.slice(0,4).map(day=>`<div class="dayCard"><strong>${day.name}</strong><div class="small" style="margin-top:6px;">${day.exercises.slice(0,3).map(ex=>`${ex[0]} → ${autoSubstitution(ex, day, state.week)}`).join('<br>')}</div></div>`).join('')}</div>
+    </div>
+  `;
+}
+
+function switchScreen(name) {
+  state.screen = name;
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".navBtn").forEach(b => b.classList.toggle("active", b.dataset.screen === name));
+  $("screen-" + name).classList.add("active");
+  save(true);
+}
+function exportState() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "gymos_v8_6_state.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function render() {
+  state.phase = phaseFromWeek(state.week);
+  renderToday();
+  renderTraining();
+  renderProgress();
+  renderNutrition();
+  renderRecovery();
+  renderCoach();
+  renderLoadGuide();
+  switchScreen(state.screen || "today");
+}
+document.querySelectorAll(".navBtn").forEach(btn => btn.onclick = () => switchScreen(btn.dataset.screen));
+$("themeBtn").onclick = () => applyTheme(document.body.dataset.theme === "light" ? "dark" : "light");
+load();
+applyTheme(storageGet(THEME_KEY) || "dark");
+state.phase = phaseFromWeek(state.week);
+render();
+</script>
+</body>
+</html>

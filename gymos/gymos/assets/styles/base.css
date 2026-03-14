@@ -1,0 +1,47 @@
+/**
+ * GymOS v9 — Base Styles
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+}
+
+body {
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(79, 213, 168, 0.12), transparent 40%),
+    radial-gradient(900px 500px at 100% 0%, rgba(109, 167, 255, 0.12), transparent 35%),
+    var(--bg);
+  color: var(--text);
+  -webkit-overflow-scrolling: touch;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+select,
+input[type="number"],
+input[type="text"],
+textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+}

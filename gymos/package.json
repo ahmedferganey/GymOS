@@ -1,0 +1,14 @@
+{
+  "name": "gymos",
+  "version": "9.0.0",
+  "description": "Mobile-first training operating system for gym coaching, logging, progression, nutrition, and recovery",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve . -p 3000",
+    "start": "npx serve . -p 3000",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js 2>/dev/null || echo 'Run: npm install jest'"
+  },
+  "keywords": ["gym", "training", "fitness", "coaching", "progression"],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,144 @@
+/**
+ * GymOS v9 — Layout
+ */
+
+.app {
+  min-height: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 16px 16px calc(84px + var(--safe-b));
+}
+
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  padding: 8px 0 14px;
+  background: linear-gradient(180deg, rgba(11, 15, 20, 0.95), rgba(11, 15, 20, 0.82) 70%, rgba(11, 15, 20, 0));
+  backdrop-filter: blur(12px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.logoWrap {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at 30% 30%, rgba(79, 213, 168, 0.95), transparent 52%),
+    radial-gradient(circle at 70% 70%, rgba(109, 167, 255, 0.95), transparent 48%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+  box-shadow: var(--shadow);
+}
+
+.title h1 {
+  margin: 0;
+  font-size: var(--text-xl);
+  line-height: 1.1;
+}
+
+.title p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.main {
+  min-height: 200px;
+}
+
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+.dayJumpBar { position: sticky; top: 74px; z-index: 12; margin-top: 10px; }
+.jumpScroller { display: flex; gap: 8px; overflow: auto; padding-bottom: 2px; scroll-snap-type: x proximity; }
+.jumpChip { white-space: nowrap; scroll-snap-align: start; }
+.dayBodyCollapsed { display: none; }
+
+.bottomNav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  padding: 10px 12px calc(10px + var(--safe-b));
+  background: linear-gradient(180deg, rgba(11, 15, 20, 0), rgba(11, 15, 20, 0.95) 30%);
+}
+
+.navShell {
+  width: min(520px, calc(100vw - 24px));
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 8px;
+  background: rgba(18, 24, 33, 0.92);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+}
+
+@media (max-width: 560px) {
+  .app {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .brand {
+    align-items: flex-start;
+  }
+  .logoWrap {
+    align-items: flex-start;
+  }
+  .title {
+    min-width: 0;
+  }
+  .title h1 {
+    font-size: var(--text-lg);
+  }
+  .title p {
+    font-size: 11px;
+  }
+  .navShell {
+    width: calc(100vw - 16px);
+    gap: 4px;
+    padding: 6px;
+  }
+  .navBtn {
+    padding: 10px 4px;
+    font-size: 10px;
+  }
+}
+
+@media (min-width: 760px) {
+  .app {
+    max-width: 980px;
+  }
+  .bottomNav {
+    justify-content: flex-end;
+    right: 18px;
+    left: auto;
+  }
+  .navShell {
+    width: 360px;
+  }
+}

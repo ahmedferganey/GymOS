@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>GymOS v9 — Training Operating System</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect fill='%234fd5a8' width='16' height='32'/><rect fill='%236da7ff' x='16' width='16' height='32'/></svg>" />
+  <link rel="stylesheet" href="assets/styles/tokens.css" />
+  <link rel="stylesheet" href="assets/styles/base.css" />
+  <link rel="stylesheet" href="assets/styles/layout.css" />
+  <link rel="stylesheet" href="assets/styles/components.css" />
+  <link rel="stylesheet" href="assets/styles/utilities.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="top">
+      <div class="brand">
+        <div class="logoWrap">
+          <div class="logo"></div>
+          <div class="title">
+            <h1>GymOS v9</h1>
+            <p>Training operating system — Phase 1 scaffold</p>
+          </div>
+        </div>
+        <button class="iconBtn" id="themeBtn" aria-label="toggle theme">◐</button>
+      </div>
+    </div>
+
+    <main class="main">
+      <section class="screen active" id="screen-today" data-screen="today"></section>
+      <section class="screen" id="screen-training" data-screen="training"></section>
+      <section class="screen" id="screen-progress" data-screen="progress"></section>
+      <section class="screen" id="screen-nutrition" data-screen="nutrition"></section>
+      <section class="screen" id="screen-recovery" data-screen="recovery"></section>
+      <section class="screen" id="screen-coach" data-screen="coach"></section>
+      <section class="screen" id="screen-loadguide" data-screen="loadguide"></section>
+    </main>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <nav class="bottomNav">
+    <div class="navShell">
+      <button class="navBtn active" data-screen="today">Today</button>
+      <button class="navBtn" data-screen="training">Training</button>
+      <button class="navBtn" data-screen="progress">Progress</button>
+      <button class="navBtn" data-screen="nutrition">Nutrition</button>
+      <button class="navBtn" data-screen="recovery">Recovery</button>
+      <button class="navBtn" data-screen="coach">Coach</button>
+      <button class="navBtn" data-screen="loadguide">Load</button>
+    </div>
+  </nav>
+
+  <script type="module" src="src/app/bootstrap.js"></script>
+</body>
+</html>

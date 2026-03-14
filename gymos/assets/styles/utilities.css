@@ -1,0 +1,72 @@
+/**
+ * GymOS v9 — Utilities
+ */
+
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.row.between {
+  justify-content: space-between;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.miniGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.badgeRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.callout {
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 10px 0;
+}
+
+@media (max-width: 560px) {
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+  .row {
+    flex-wrap: wrap;
+  }
+  .row > * {
+    min-width: 0;
+  }
+  .miniGrid {
+    grid-template-columns: 1fr;
+  }
+}

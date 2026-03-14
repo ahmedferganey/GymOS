@@ -1,0 +1,14 @@
+[
+  {
+    "id": "d1",
+    "name": "Day 1 — Upper",
+    "focus": "Upper body focus",
+    "group": "upperHeavy",
+    "cardio": { "type": "Walk", "minutes": 15 },
+    "warmup": [["Hip Thrust", 2, "12"], ["Band Pull-Apart", 2, "15"]],
+    "exercises": [
+      ["Incline Barbell Press", "compound", "4", "8", "RIR 2", "2-1-1", ["Upper chest"], ["Triceps"], "DB Incline"],
+      ["Pull-Up", "compound", "4", "6", "RIR 2", "2-1-1", ["Lats"], ["Biceps"], "Lat Pulldown"]
+    ]
+  }
+]
